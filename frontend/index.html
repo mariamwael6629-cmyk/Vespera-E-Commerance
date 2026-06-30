@@ -1,0 +1,2367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VESPERA — Considered Objects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===================== DESIGN TOKENS ===================== */
+:root{
+  --ink:#15110F;
+  --ink-soft:#221C19;
+  --surface:#2A2220;
+  --surface-soft:#352B27;
+  --ivory:#F6EFE4;
+  --ivory-dim:#EDE3D3;
+  --beige:#E8DCC8;
+  --burgundy:#5C1A23;
+  --burgundy-bright:#7A2330;
+  --copper:#B87A4B;
+  --copper-bright:#D49A6A;
+  --copper-dim:#8C6240;
+  --line:rgba(246,239,228,0.10);
+  --line-strong:rgba(246,239,228,0.18);
+  --text-dim:rgba(246,239,228,0.58);
+  --text-faint:rgba(246,239,228,0.36);
+
+  --font-display:'Fraunces', serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+
+  --radius-sm:6px;
+  --radius-md:12px;
+  --radius-lg:20px;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+
+/* Light mode overrides */
+[data-theme="light"]{
+  --ink:#F6EFE4;
+  --ink-soft:#EDE3D3;
+  --surface:#FFFCF6;
+  --surface-soft:#FBF5EA;
+  --ivory:#15110F;
+  --ivory-dim:#221C19;
+  --beige:#3A2F2A;
+  --line:rgba(21,17,15,0.10);
+  --line-strong:rgba(21,17,15,0.18);
+  --text-dim:rgba(21,17,15,0.62);
+  --text-faint:rgba(21,17,15,0.40);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--ink);
+  color:var(--ivory);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.5;
+  overflow-x:hidden;
+  transition:background .4s var(--ease), color .4s var(--ease);
+}
+::selection{background:var(--copper);color:var(--ink);}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+img{display:block;max-width:100%;}
+.serif{font-family:var(--font-display);}
+.mono{font-family:var(--font-mono);}
+
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-track{background:var(--ink);}
+::-webkit-scrollbar-thumb{background:var(--surface-soft);border-radius:8px;}
+::-webkit-scrollbar-thumb:hover{background:var(--copper-dim);}
+
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+}
+
+/* Focus visibility */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible{
+  outline:2px solid var(--copper-bright);
+  outline-offset:3px;
+  border-radius:4px;
+}
+
+/* ===================== UTILITY ===================== */
+.app{min-height:100vh;display:flex;flex-direction:column;}
+.container{max-width:1320px;margin:0 inline-size;margin-inline:auto;padding:0 40px;}
+@media (max-width:900px){.container{padding:0 22px;}}
+
+.glass{
+  background:linear-gradient(155deg, rgba(246,239,228,0.07), rgba(246,239,228,0.02));
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--line);
+}
+[data-theme="light"] .glass{
+  background:linear-gradient(155deg, rgba(255,255,255,0.6), rgba(255,255,255,0.25));
+}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 28px;border-radius:999px;font-size:13px;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;
+  transition:transform .35s var(--ease), box-shadow .35s var(--ease), background .35s var(--ease), color .35s var(--ease), border-color .35s var(--ease);
+  white-space:nowrap;
+}
+.btn-primary{
+  background:linear-gradient(155deg, var(--copper-bright), var(--copper-dim));
+  color:var(--ink);
+  box-shadow:0 8px 24px -8px rgba(184,122,75,0.5);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px -8px rgba(184,122,75,0.65);}
+.btn-primary:active{transform:translateY(0px) scale(.98);}
+.btn-ghost{
+  border:1px solid var(--line-strong);
+  color:var(--ivory);
+  background:rgba(246,239,228,0.02);
+}
+.btn-ghost:hover{border-color:var(--copper);background:rgba(184,122,75,0.08);}
+.btn-dark{
+  background:var(--ink);
+  color:var(--ivory);
+  border:1px solid var(--line-strong);
+}
+.btn-sm{padding:10px 18px;font-size:11.5px;}
+.btn-lg{padding:18px 36px;font-size:14px;}
+.btn-block{width:100%;}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none !important;}
+.btn-icon{
+  width:42px;height:42px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid var(--line-strong);
+  transition:transform .3s var(--ease), border-color .3s var(--ease), background .3s var(--ease);
+}
+.btn-icon:hover{border-color:var(--copper);background:rgba(184,122,75,0.1);transform:translateY(-1px);}
+
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--copper-bright);
+  display:flex;align-items:center;gap:10px;
+}
+.eyebrow::before{content:'';width:18px;height:1px;background:var(--copper-bright);}
+
+.divider{height:1px;background:var(--line);border:none;width:100%;}
+
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:999px;
+  font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  font-family:var(--font-mono);
+}
+.badge-copper{background:rgba(184,122,75,0.16);color:var(--copper-bright);border:1px solid rgba(184,122,75,0.3);}
+.badge-burgundy{background:rgba(122,35,48,0.22);color:#E8919E;border:1px solid rgba(122,35,48,0.4);}
+.badge-ivory{background:rgba(246,239,228,0.08);color:var(--ivory);border:1px solid var(--line-strong);}
+.badge-success{background:rgba(120,160,110,0.14);color:#9FC79A;border:1px solid rgba(120,160,110,0.3);}
+
+/* fade/scale page transition */
+.view{animation:viewIn .5s var(--ease);}
+@keyframes viewIn{
+  from{opacity:0; transform:translateY(14px);}
+  to{opacity:1; transform:translateY(0);}
+}
+.view-exit{animation:viewOut .25s var(--ease) forwards;}
+@keyframes viewOut{
+  to{opacity:0; transform:translateY(-8px);}
+}
+
+/* skeleton-alternative premium loader: woven thread */
+.loader-wrap{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:24px;
+  transition:opacity .6s var(--ease), visibility .6s;
+}
+.loader-mark{
+  width:64px;height:64px;position:relative;
+}
+.loader-mark svg{width:100%;height:100%;}
+.loader-ring{
+  fill:none;stroke:var(--copper);stroke-width:1.4;
+  stroke-dasharray:8 6;
+  animation:loaderSpin 2.2s linear infinite;
+  transform-origin:center;
+}
+.loader-core{
+  fill:none;stroke:var(--ivory);stroke-width:1;opacity:.5;
+  stroke-dasharray:200;
+  animation:loaderDraw 1.8s var(--ease) infinite alternate;
+}
+@keyframes loaderSpin{to{transform:rotate(360deg);}}
+@keyframes loaderDraw{from{stroke-dashoffset:200;} to{stroke-dashoffset:0;}}
+.loader-text{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--text-dim);
+}
+
+/* toast / notification */
+.toast-stack{
+  position:fixed;top:90px;right:24px;z-index:8000;
+  display:flex;flex-direction:column;gap:10px;
+  width:340px;
+}
+@media (max-width:600px){.toast-stack{right:14px;left:14px;width:auto;top:80px;}}
+.toast{
+  padding:16px 18px;border-radius:var(--radius-md);
+  display:flex;align-items:flex-start;gap:12px;
+  animation:toastIn .45s var(--ease);
+  box-shadow:0 20px 40px -16px rgba(0,0,0,.5);
+}
+@keyframes toastIn{
+  from{opacity:0; transform:translateX(40px) scale(.95);}
+  to{opacity:1; transform:translateX(0) scale(1);}
+}
+.toast.leaving{animation:toastOut .35s var(--ease) forwards;}
+@keyframes toastOut{to{opacity:0; transform:translateX(40px) scale(.95);}}
+.toast-icon{
+  width:34px;height:34px;border-radius:50%;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;
+}
+.toast-title{font-size:13.5px;font-weight:700;margin-bottom:2px;}
+.toast-msg{font-size:12.5px;color:var(--text-dim);line-height:1.4;}
+.toast-close{margin-left:auto;flex:none;opacity:.5;font-size:18px;line-height:1;}
+.toast-close:hover{opacity:1;}
+
+/* Modal/drawer overlay */
+.overlay{
+  position:fixed;inset:0;z-index:7000;
+  background:rgba(10,8,7,0.7);
+  backdrop-filter:blur(6px);
+  display:flex;
+  opacity:0;visibility:hidden;
+  transition:opacity .4s var(--ease), visibility .4s;
+}
+.overlay.open{opacity:1;visibility:visible;}
+.drawer{
+  margin-left:auto;height:100%;width:min(440px, 92vw);
+  background:var(--surface);
+  border-left:1px solid var(--line-strong);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .5s var(--ease);
+}
+.overlay.open .drawer{transform:translateX(0);}
+.modal-center{
+  margin:auto;width:min(480px, 92vw);
+  background:var(--surface);
+  border:1px solid var(--line-strong);
+  border-radius:var(--radius-lg);
+  transform:scale(.94) translateY(10px);
+  transition:transform .4s var(--ease);
+  max-height:88vh;overflow-y:auto;
+}
+.overlay.open .modal-center{transform:scale(1) translateY(0);}
+
+/* Form elements */
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:18px;}
+.field label{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-dim);}
+.field input, .field select, .field textarea{
+  background:rgba(246,239,228,0.04);
+  border:1px solid var(--line-strong);
+  border-radius:var(--radius-sm);
+  padding:13px 15px;
+  color:var(--ivory);
+  font-family:var(--font-body);
+  font-size:14px;
+  transition:border-color .3s var(--ease), background .3s var(--ease);
+}
+[data-theme="light"] .field input, [data-theme="light"] .field select, [data-theme="light"] .field textarea{
+  background:rgba(21,17,15,0.03);
+}
+.field input:focus, .field select:focus, .field textarea:focus{
+  border-color:var(--copper);
+  background:rgba(184,122,75,0.06);
+  outline:none;
+}
+.field-hint{font-size:11.5px;color:var(--text-faint);}
+.field-error{font-size:11.5px;color:#E8919E;}
+.field.has-error input{border-color:#7A2330;}
+.checkbox-row{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-dim);}
+.checkbox-row input{accent-color:var(--copper);width:16px;height:16px;}
+
+/* Cards */
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  transition:border-color .35s var(--ease), transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+
+/* Scroll reveal */
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .8s var(--ease), transform .8s var(--ease);}
+.reveal.in{opacity:1; transform:translateY(0);}
+
+a, button, input, select{-webkit-tap-highlight-color:transparent;}
+
+/* ===================== RESPONSIVE ===================== */
+@media (min-width: 901px){
+  .auth-visual{display:block !important;}
+  .auth-mobile-logo{display:none;}
+}
+@media (max-width: 900px){
+  .nav-desktop{display:none;}
+  .nav-burger{display:inline-flex;}
+  #hero-grid{grid-template-columns:1fr !important;min-height:auto !important;gap:40px !important;}
+  .hero-visual{height:380px !important;order:-1;}
+  .cat-grid{grid-template-columns:repeat(2,1fr) !important;}
+  .product-grid{grid-template-columns:repeat(2,1fr) !important;}
+  .product-grid-3{grid-template-columns:repeat(2,1fr) !important;}
+  .about-grid{grid-template-columns:1fr !important;}
+  .catalog-grid{grid-template-columns:1fr !important;}
+  .catalog-filters{order:2;border-top:1px solid var(--line);padding-top:24px;margin-top:24px;}
+  .pdp-grid{grid-template-columns:1fr !important;gap:32px !important;}
+  .reviews-grid{grid-template-columns:1fr !important;gap:24px !important;}
+  .cart-page-grid{grid-template-columns:1fr !important;}
+  .dash-grid{grid-template-columns:1fr !important;}
+  .addr-grid{grid-template-columns:1fr !important;}
+  .footer-grid{grid-template-columns:1fr 1fr !important;gap:32px !important;}
+  .admin-sidebar{position:fixed;left:0;top:0;bottom:0;z-index:400;transform:translateX(-100%);transition:transform .4s var(--ease);}
+  .admin-sidebar.open{transform:translateX(0);}
+  .admin-stat-grid{grid-template-columns:repeat(2,1fr) !important;}
+  .admin-chart-row{grid-template-columns:1fr !important;}
+  .promo-grid{grid-template-columns:1fr !important;}
+  .qv-grid{grid-template-columns:1fr !important;}
+  .qv-grid img{border-radius:var(--radius-lg) var(--radius-lg) 0 0 !important;min-height:220px !important;}
+}
+@media (max-width: 600px){
+  .cat-grid{grid-template-columns:1fr 1fr !important;gap:12px !important;}
+  .product-grid{grid-template-columns:1fr 1fr !important;gap:14px !important;}
+  .product-grid-3{grid-template-columns:1fr 1fr !important;gap:14px !important;}
+  .footer-grid{grid-template-columns:1fr !important;}
+  .admin-stat-grid{grid-template-columns:1fr 1fr !important;}
+  .nav-login{display:none;}
+  h1.serif{word-break:break-word;}
+}
+@media (max-width: 420px){
+  .cat-grid, .product-grid, .product-grid-3{grid-template-columns:1fr !important;}
+}
+</style>
+</head>
+<body>
+
+<div id="loader" class="loader-wrap">
+  <div class="loader-mark">
+    <svg viewBox="0 0 64 64">
+      <circle class="loader-ring" cx="32" cy="32" r="26"/>
+      <path class="loader-core" d="M16 32 L26 42 L48 18"/>
+    </svg>
+  </div>
+  <div class="loader-text">Vespera</div>
+</div>
+
+<div id="app" class="app" style="opacity:0;"></div>
+<div id="toast-stack" class="toast-stack"></div>
+<div id="overlay-root"></div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+/* ============================================================
+   VESPERA — single-file e-commerce prototype
+   Sections: DATA -> STATE -> UTILS -> ICONS -> ROUTER -> VIEWS -> INIT
+   ============================================================ */
+
+/* ===================== MOCK DATA ===================== */
+const CATEGORIES = [
+  {id:'audio', name:'Audio', desc:'Headphones, speakers, and listening objects'},
+  {id:'carry', name:'Carry', desc:'Leather sleeves, bags, and device cases'},
+  {id:'desk', name:'Desk', desc:'Stands, trays, and considered hardware'},
+  {id:'wearables', name:'Wearables', desc:'Straps, bands, and quiet tech'},
+];
+
+const MATERIALS = {
+  walnut:{name:'Walnut', sw:'linear-gradient(135deg,#6b4730,#4a2f1d)'},
+  obsidian:{name:'Obsidian', sw:'linear-gradient(135deg,#3a3530,#15110F)'},
+  ivory:{name:'Bone Ivory', sw:'linear-gradient(135deg,#F6EFE4,#D8CBB0)'},
+  burgundy:{name:'Burgundy', sw:'linear-gradient(135deg,#7A2330,#3C1015)'},
+  copper:{name:'Copper', sw:'linear-gradient(135deg,#D49A6A,#8C6240)'},
+  slate:{name:'Slate', sw:'linear-gradient(135deg,#5b5650,#36322e)'},
+};
+
+function img(seed, w=800, h=800){ return `https://picsum.photos/seed/${seed}/${w}/${h}`; }
+
+const PRODUCTS = [
+  {id:'p01', name:'Aria II Headphones', cat:'audio', price:429, compareAt:480, rating:4.8, reviews:212,
+   tag:'Bestseller', materials:['obsidian','walnut','burgundy'], stock:14,
+   desc:"Hand-finished walnut earcups around a 40mm beryllium driver. Aria II is tuned for warmth without losing detail — built for rooms, not gyms.",
+   specs:{'Driver':'40mm beryllium-coated','Battery':'38 hrs','Weight':'284g','Connectivity':'Bluetooth 5.3, 3.5mm'},
+   images:[img('aria1'),img('aria2'),img('aria3'),img('aria4')]},
+  {id:'p02', name:'Folio Sleeve — 14"', cat:'carry', price:189, compareAt:null, rating:4.9, reviews:98,
+   tag:'New', materials:['burgundy','obsidian','copper'], stock:31,
+   desc:"Full-grain leather, vegetable tanned, that darkens beautifully with use. A single seam, no branding, just a quiet copper pull-tab.",
+   specs:{'Material':'Full-grain leather','Fit':'13"–14" laptops','Lining':'Brushed wool felt','Origin':'Made in Portugal'},
+   images:[img('folio1'),img('folio2'),img('folio3'),img('folio4')]},
+  {id:'p03', name:'Monolith Stand', cat:'desk', price:159, compareAt:null, rating:4.7, reviews:64,
+   tag:null, materials:['obsidian','slate','walnut'], stock:22,
+   desc:"A single block of resin-cast stone, milled to hold any laptop at a 12° typing angle. Cools passively. Sits like furniture, not hardware.",
+   specs:{'Material':'Cast composite stone','Angle':'12°','Weight':'1.2kg','Compatibility':'11"–16" laptops'},
+   images:[img('mono1'),img('mono2'),img('mono3'),img('mono4')]},
+  {id:'p04', name:'Cusp Earbuds', cat:'audio', price:249, compareAt:289, rating:4.6, reviews:341,
+   tag:'Sale', materials:['ivory','obsidian','copper'], stock:8,
+   desc:"Ceramic-shelled earbuds with adaptive noise cancellation tuned across three listening profiles. The case doubles as a wireless charging puck.",
+   specs:{'ANC':'Adaptive, 3 profiles','Battery':'6h + 24h case','Charging':'USB-C, Qi','Water rating':'IPX4'},
+   images:[img('cusp1'),img('cusp2'),img('cusp3'),img('cusp4')]},
+  {id:'p05', name:'Strand Watch Band', cat:'wearables', price:89, compareAt:null, rating:4.5, reviews:52,
+   tag:null, materials:['burgundy','walnut','slate'], stock:46,
+   desc:"Woven Italian leather strand-strap with a brushed copper clasp. Fits all standard 20mm lug watches and most smartwatches.",
+   specs:{'Width':'20mm','Material':'Woven leather','Clasp':'Brushed copper','Adjustable':'6 positions'},
+   images:[img('strand1'),img('strand2'),img('strand3'),img('strand4')]},
+  {id:'p06', name:'Ledger Tray', cat:'desk', price:119, compareAt:null, rating:4.9, reviews:39,
+   tag:'New', materials:['walnut','obsidian','ivory'], stock:17,
+   desc:"A catch-all valet tray in solid walnut with a felt-lined recess for watches, rings, and the small things that pile up by your keyboard.",
+   specs:{'Material':'Solid walnut','Dimensions':'24×14×3cm','Lining':'Wool felt','Finish':'Hand-oiled'},
+   images:[img('ledger1'),img('ledger2'),img('ledger3'),img('ledger4')]},
+  {id:'p07', name:'Halcyon Speaker', cat:'audio', price:599, compareAt:649, rating:4.8, reviews:127,
+   tag:'Sale', materials:['obsidian','burgundy','slate'], stock:11,
+   desc:"A single full-range driver inside a cast aluminum body wrapped in wool. Fills a room evenly without a subwoofer's bloat.",
+   specs:{'Driver':'Full-range 4"','Power':'60W class D','Connectivity':'Wi-Fi, Bluetooth 5.3','Weight':'2.1kg'},
+   images:[img('halc1'),img('halc2'),img('halc3'),img('halc4')]},
+  {id:'p08', name:'Weekender Carryall', cat:'carry', price:349, compareAt:null, rating:4.7, reviews:76,
+   tag:null, materials:['burgundy','walnut','obsidian'], stock:9,
+   desc:"A 38-litre weekend bag in waxed canvas and leather trim, built around a padded laptop sleeve and a separate shoe compartment.",
+   specs:{'Capacity':'38L','Material':'Waxed canvas, leather trim','Laptop sleeve':'Up to 16"','Strap':'Detachable, adjustable'},
+   images:[img('week1'),img('week2'),img('week3'),img('week4')]},
+  {id:'p09', name:'Cradle Charging Dock', cat:'desk', price:99, compareAt:null, rating:4.4, reviews:58,
+   tag:null, materials:['obsidian','copper','ivory'], stock:0,
+   desc:"Three-coil wireless charging dock machined from a single aluminum block, finished to match Aria II and Cusp.",
+   specs:{'Output':'15W phone, 5W buds, 3W watch','Material':'Anodized aluminum','Cable':'2m braided USB-C','Compatibility':'Qi-enabled devices'},
+   images:[img('cradle1'),img('cradle2'),img('cradle3'),img('cradle4')]},
+  {id:'p10', name:'Quill Stylus', cat:'wearables', price:129, compareAt:149, rating:4.6, reviews:88,
+   tag:'Sale', materials:['walnut','obsidian','burgundy'], stock:25,
+   desc:"A pressure-sensitive stylus turned from solid walnut around an aluminum core, magnetically charging and pairing in one motion.",
+   specs:{'Pressure levels':'4096','Battery':'2 weeks','Charging':'Magnetic dock','Compatibility':'Most tablets'},
+   images:[img('quill1'),img('quill2'),img('quill3'),img('quill4')]},
+  {id:'p11', name:'Aria II — Travel Case', cat:'carry', price:69, compareAt:null, rating:4.8, reviews:44,
+   tag:null, materials:['obsidian','burgundy'], stock:38,
+   desc:"A molded EVA case wrapped in the same leather as Folio, shaped precisely for Aria II's earcups and folded headband.",
+   specs:{'Material':'EVA + leather wrap','Fit':'Aria II only','Closure':'Magnetic flap','Interior':'Microsuede lining'},
+   images:[img('case1'),img('case2'),img('case3'),img('case4')]},
+  {id:'p12', name:'Plinth Phone Stand', cat:'desk', price:59, compareAt:null, rating:4.3, reviews:29,
+   tag:null, materials:['slate','walnut','obsidian'], stock:54,
+   desc:"A minimal, weighted phone stand for calls, video, and counter-top recipes. Two viewing angles, no moving parts.",
+   specs:{'Material':'Cast resin + steel base','Angles':'2 fixed positions','Compatibility':'All phone sizes','Weight':'310g'},
+   images:[img('plinth1'),img('plinth2'),img('plinth3'),img('plinth4')]},
+];
+
+const REVIEWS_POOL = [
+  {name:'Mariam K.', rating:5, title:'Worth every cent', body:"The walnut earcups are exactly as described — warm, detailed sound and they look incredible on a desk when not in use.", days:6},
+  {name:'Theo R.', rating:5, title:'Better than the brand I switched from', body:"Comfortable for long sessions and the battery genuinely lasts the stated time. No notes.", days:14},
+  {name:'Priya S.', rating:4, title:'Beautiful, slightly heavy', body:"Build quality is outstanding. Wish it were a touch lighter for travel but I'm not sending it back.", days:21},
+  {name:'Daniel O.', rating:5, title:'Exceeded expectations', body:"Packaging alone felt premium. The product matches it. Already looking at the speaker next.", days:30},
+  {name:'Yusuf A.', rating:4, title:'Great everyday piece', body:"Subtle, well-made, does the job without shouting about it. Exactly what I wanted.", days:45},
+];
+
+function genReviews(productId, count){
+  const out = [];
+  for(let i=0;i<count;i++){
+    const base = REVIEWS_POOL[i % REVIEWS_POOL.length];
+    out.push({...base, id:`${productId}-r${i}`});
+  }
+  return out;
+}
+
+const ORDERS = [
+  {id:'VS-10482', date:'2026-06-12', status:'delivered', total:618, items:[{pid:'p01',qty:1,material:'walnut'},{pid:'p11',qty:1,material:'obsidian'}]},
+  {id:'VS-10417', date:'2026-05-29', status:'shipped', total:159, items:[{pid:'p03',qty:1,material:'slate'}]},
+  {id:'VS-10309', date:'2026-05-02', status:'processing', total:349, items:[{pid:'p08',qty:1,material:'burgundy'}]},
+  {id:'VS-10201', date:'2026-04-11', status:'delivered', total:338, items:[{pid:'p05',qty:2,material:'walnut'},{pid:'p12',qty:1,material:'slate'}]},
+];
+
+const ADMIN_USERS = [
+  {id:'u01', name:'Mariam Khalil', email:'mariam@vespera.shop', role:'Customer', orders:4, spent:1464, joined:'2025-11-02', status:'active'},
+  {id:'u02', name:'Theo Reyes', email:'theo.reyes@gmail.com', role:'Customer', orders:1, spent:429, joined:'2026-02-18', status:'active'},
+  {id:'u03', name:'Priya Sharma', email:'p.sharma@outlook.com', role:'Customer', orders:7, spent:2890, joined:'2025-08-30', status:'active'},
+  {id:'u04', name:'Daniel Osei', email:'d.osei@proton.me', role:'Admin', orders:0, spent:0, joined:'2025-06-01', status:'active'},
+  {id:'u05', name:'Yusuf Ahmed', email:'yusuf.a@icloud.com', role:'Customer', orders:2, spent:518, joined:'2026-03-22', status:'suspended'},
+  {id:'u06', name:'Lena Voss', email:'lena.voss@vespera.shop', role:'Editor', orders:0, spent:0, joined:'2025-09-14', status:'active'},
+];
+
+const PROMO_CODES = [
+  {code:'WELCOME10', type:'percent', value:10, uses:842, limit:5000, active:true, expires:'2026-12-31'},
+  {code:'SUMMER25', type:'percent', value:25, uses:301, limit:1000, active:true, expires:'2026-08-31'},
+  {code:'FREESHIP', type:'shipping', value:100, uses:1209, limit:null, active:true, expires:null},
+  {code:'VIP50', type:'fixed', value:50, uses:44, limit:200, active:false, expires:'2026-03-01'},
+];
+
+let ADMIN_ORDERS = [];
+
+/* ===================== API LAYER ===================== */
+const API_BASE = 'http://localhost:8000/api';
+const TOKEN_KEY = 'vsp_token';
+function getToken(){ return localStorage.getItem(TOKEN_KEY); }
+function setToken(t){ if(t) localStorage.setItem(TOKEN_KEY, t); else localStorage.removeItem(TOKEN_KEY); }
+
+async function apiFetch(path, options={}){
+  const headers = Object.assign({'Content-Type':'application/json'}, options.headers||{});
+  const token = getToken();
+  if(token) headers['Authorization'] = 'Bearer '+token;
+  const res = await fetch(API_BASE+path, Object.assign({}, options, {headers}));
+  let data = null;
+  try{ data = await res.json(); }catch(e){}
+  if(!res.ok){
+    const message = (data && data.detail) || res.statusText || 'Request failed';
+    throw new Error(typeof message==='string' ? message : 'Request failed');
+  }
+  return data;
+}
+
+function normalizeProduct(p){
+  return {id:p.id, name:p.name, cat:p.category_id, price:p.price, compareAt:p.compare_at,
+    rating:p.rating, reviews:p.reviews_count, tag:p.tag, materials:p.materials, stock:p.stock,
+    desc:p.description, specs:p.specs, images:p.images};
+}
+function normalizeCategory(c){ return {id:c.id, name:c.name, desc:c.description}; }
+function normalizePromo(p){ return {id:p.id, code:p.code, type:p.type, value:p.value, uses:p.uses, limit:p.usage_limit, active:p.active, expires:p.expires}; }
+function normalizeOrder(o){
+  return {id:o.id, date:(o.created_at||'').slice(0,10), status:o.status, total:o.total,
+    items:(o.items||[]).map(it=>({pid:it.product_id, qty:it.qty, material:it.material}))};
+}
+function normalizeAdminUser(u){
+  return {id:u.id, name:u.name, email:u.email, role:u.role==='admin'?'Admin':'Customer',
+    orders:u.orders_count, spent:u.spent, joined:(u.created_at||'').slice(0,10), status:u.status};
+}
+function daysAgo(iso){
+  const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  return Math.max(0, d);
+}
+function normalizeReview(r){
+  return {id:r.id, name:r.author_name, rating:r.rating, title:r.title, body:r.body, days:daysAgo(r.created_at)};
+}
+
+async function loadCategoriesFromAPI(){
+  try{ const data = await apiFetch('/categories'); if(Array.isArray(data) && data.length){ CATEGORIES.length=0; CATEGORIES.push(...data.map(normalizeCategory)); } }
+  catch(e){ console.warn('Using local categories fallback:', e.message); }
+}
+async function loadProductsFromAPI(){
+  try{ const data = await apiFetch('/products'); if(Array.isArray(data) && data.length){ PRODUCTS.length=0; PRODUCTS.push(...data.map(normalizeProduct)); } }
+  catch(e){ console.warn('Using local products fallback:', e.message); }
+}
+async function loadMyOrders(){
+  if(!State.user) return;
+  try{ const data = await apiFetch('/orders'); if(Array.isArray(data)){ ORDERS.length=0; ORDERS.push(...data.map(normalizeOrder)); } }
+  catch(e){ console.warn('Could not load orders:', e.message); }
+}
+async function loadMyWishlist(){
+  try{ const data = await apiFetch('/wishlist'); if(data && Array.isArray(data.product_ids)){ State.wishlist = data.product_ids; } }
+  catch(e){ console.warn('Could not load wishlist:', e.message); }
+}
+async function loadProductReviews(pid){
+  try{
+    const data = await apiFetch('/products/'+pid+'/reviews');
+    if(Array.isArray(data)){
+      pdpState.realReviews = data.map(normalizeReview);
+      if(pdpState.pid===pid && pdpState.tab==='reviews') renderApp();
+    }
+  }catch(e){ console.warn('Could not load reviews:', e.message); }
+}
+function openWriteReview(pid){
+  if(!State.user){ toast('info','Sign in required','Create an account to write a review.'); return; }
+  const ratingStr = window.prompt('Rating (1-5)?', '5');
+  if(ratingStr===null) return;
+  const rating = clamp(parseInt(ratingStr,10)||5, 1, 5);
+  const title = window.prompt('Review title?');
+  if(title===null || !title.trim()) return;
+  const body = window.prompt('Your review?');
+  if(body===null || !body.trim()) return;
+  submitReview(pid, {rating, title: title.trim(), body: body.trim()});
+}
+async function submitReview(pid, payload){
+  try{
+    await apiFetch('/products/'+pid+'/reviews', {method:'POST', body: JSON.stringify(payload)});
+    toast('success','Review submitted','Thanks for sharing your feedback.');
+    await Promise.all([loadProductReviews(pid), loadProductsFromAPI()]);
+    renderApp();
+  }catch(e){ toast('error','Could not submit review', e.message); }
+}
+async function loadAdminUsers(){
+  try{ const data = await apiFetch('/admin/users'); if(Array.isArray(data)){ ADMIN_USERS.length=0; ADMIN_USERS.push(...data.map(normalizeAdminUser)); } }
+  catch(e){ console.warn('Could not load admin users:', e.message); }
+}
+async function loadAdminPromos(){
+  try{ const data = await apiFetch('/promos'); if(Array.isArray(data)){ PROMO_CODES.length=0; PROMO_CODES.push(...data.map(normalizePromo)); } }
+  catch(e){ console.warn('Could not load admin promos:', e.message); }
+}
+async function loadAdminOrders(){
+  try{
+    const data = await apiFetch('/admin/orders');
+    if(Array.isArray(data)){
+      ADMIN_ORDERS.length=0;
+      ADMIN_ORDERS.push(...data.map(o=>Object.assign(normalizeOrder(o), {customer:(o.shipping_address&&(o.shipping_address.name||o.shipping_address.email))||'—'})));
+    }
+  }catch(e){ console.warn('Could not load admin orders:', e.message); }
+}
+async function loadAdminData(){
+  await Promise.all([loadAdminUsers(), loadAdminPromos(), loadAdminOrders()]);
+  renderApp();
+}
+async function restoreSession(){
+  const token = getToken();
+  if(!token) return;
+  try{
+    const me = await apiFetch('/auth/me');
+    State.user = {id:me.id, name:me.name, email:me.email, role:me.role};
+    await Promise.all([loadMyOrders(), loadMyWishlist()]);
+  }catch(e){ setToken(null); }
+}
+
+/* ===================== STATE ===================== */
+const State = {
+  view:'landing',
+  prevView:null,
+  params:{},
+  theme: localStorage.getItem('vsp_theme') || 'dark',
+  user: null, // {name,email}
+  cart: [], // {pid, material, qty}
+  wishlist: [], // pid
+  filters:{ cat:'all', sort:'featured', price:[0,700], search:'', materials:[] },
+  checkoutStep:1,
+  checkoutData:{ shipping:{}, payment:{}, promo:null },
+  adminView:'overview',
+  toasts:[],
+  notifOpen:false,
+  notifications:[
+    {id:1, title:'Order shipped', msg:'VS-10417 is on its way — arriving in 2 days.', time:'2h ago', unread:true, icon:'truck'},
+    {id:2, title:'Price drop', msg:'Cusp Earbuds you saved dropped to $249.', time:'1d ago', unread:true, icon:'tag'},
+    {id:3, title:'Back in stock', msg:'Cradle Charging Dock is available again.', time:'3d ago', unread:false, icon:'package'},
+  ],
+};
+
+function saveCart(){ try{ localStorage.setItem('vsp_cart', JSON.stringify(State.cart)); }catch(e){} }
+function loadCart(){ try{ const c = JSON.parse(localStorage.getItem('vsp_cart')||'[]'); State.cart = c; }catch(e){ State.cart=[]; } }
+function saveWishlist(){ try{ localStorage.setItem('vsp_wishlist', JSON.stringify(State.wishlist)); }catch(e){} }
+function loadWishlistLocal(){ try{ const w = JSON.parse(localStorage.getItem('vsp_wishlist')||'[]'); State.wishlist = w; }catch(e){ State.wishlist=[]; } }
+
+/* ===================== UTILS ===================== */
+function $(sel, root=document){ return root.querySelector(sel); }
+function $all(sel, root=document){ return [...root.querySelectorAll(sel)]; }
+function fmt(n){ return '$' + n.toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:0}); }
+function fmt2(n){ return '$' + n.toFixed(2); }
+function getProduct(id){ return PRODUCTS.find(p=>p.id===id); }
+function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+
+function navigate(view, params={}){
+  State.prevView = State.view;
+  State.view = view;
+  State.params = params;
+  window.scrollTo({top:0, behavior:'instant'});
+  render();
+}
+
+function icon(name, size=18){
+  return `<i data-lucide="${name}" style="width:${size}px;height:${size}px;" aria-hidden="true"></i>`;
+}
+
+function refreshIcons(){ if(window.lucide) lucide.createIcons(); }
+
+function toast(type, title, msg){
+  const id = Date.now() + Math.random();
+  State.toasts.push({id,type,title,msg});
+  renderToasts();
+  setTimeout(()=>dismissToast(id), 4200);
+}
+function dismissToast(id){
+  const el = document.getElementById('toast-'+id);
+  if(el){ el.classList.add('leaving'); setTimeout(()=>{ State.toasts = State.toasts.filter(t=>t.id!==id); renderToasts(); }, 300); }
+  else { State.toasts = State.toasts.filter(t=>t.id!==id); renderToasts(); }
+}
+function renderToasts(){
+  const stack = document.getElementById('toast-stack');
+  const icons = {success:'check-circle', error:'x-circle', info:'info'};
+  const colors = {
+    success:{accent:'#9FC79A', iconBg:'rgba(120,160,110,0.16)'},
+    error:{accent:'#E8919E', iconBg:'rgba(122,35,48,0.2)'},
+    info:{accent:'var(--copper-bright)', iconBg:'rgba(184,122,75,0.16)'},
+  };
+  stack.innerHTML = State.toasts.map(t=>{
+    const c = colors[t.type]||colors.info;
+    return `<div class="toast glass" id="toast-${t.id}" style="border-color:${c.accent}33;">
+      <div class="toast-icon" style="background:${c.iconBg};color:${c.accent};">${icon(icons[t.type]||'info',16)}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="toast-title">${t.title}</div>
+        <div class="toast-msg">${t.msg}</div>
+      </div>
+      <button class="toast-close" onclick="dismissToast(${t.id})" aria-label="Dismiss">×</button>
+    </div>`;
+  }).join('');
+  refreshIcons();
+}
+
+function cartCount(){ return State.cart.reduce((s,i)=>s+i.qty,0); }
+function cartSubtotal(){
+  return State.cart.reduce((s,i)=>{
+    const p = getProduct(i.pid); return s + (p?p.price*i.qty:0);
+  },0);
+}
+function addToCart(pid, material, qty=1){
+  const existing = State.cart.find(i=>i.pid===pid && i.material===material);
+  if(existing){ existing.qty += qty; } else { State.cart.push({pid,material,qty}); }
+  saveCart();
+  const p = getProduct(pid);
+  toast('success', 'Added to cart', `${p.name} — ${MATERIALS[material].name}`);
+  renderCartBadge();
+}
+function removeFromCart(pid, material){
+  State.cart = State.cart.filter(i=>!(i.pid===pid && i.material===material));
+  saveCart(); renderCartBadge();
+  if(State.view==='cart') renderApp();
+}
+function updateCartQty(pid, material, qty){
+  const item = State.cart.find(i=>i.pid===pid && i.material===material);
+  if(item){ item.qty = clamp(qty,1,9); saveCart(); }
+  if(State.view==='cart') renderApp();
+  renderCartBadge();
+}
+async function toggleWishlist(pid){
+  const idx = State.wishlist.indexOf(pid);
+  const p = getProduct(pid);
+  const wasSaved = idx>-1;
+  if(State.user){
+    try{
+      const data = wasSaved ? await apiFetch('/wishlist/'+pid, {method:'DELETE'}) : await apiFetch('/wishlist/'+pid, {method:'POST'});
+      if(data && Array.isArray(data.product_ids)) State.wishlist = data.product_ids;
+      toast(wasSaved?'info':'success', wasSaved?'Removed from wishlist':'Saved to wishlist', p.name);
+    }catch(e){ toast('error','Could not update wishlist', e.message); }
+  } else {
+    if(wasSaved){ State.wishlist.splice(idx,1); toast('info','Removed from wishlist', p.name); }
+    else { State.wishlist.push(pid); toast('success','Saved to wishlist', p.name); }
+    saveWishlist();
+  }
+  renderApp();
+}
+function renderCartBadge(){
+  $all('.cart-count').forEach(el=>{
+    const n = cartCount();
+    el.textContent = n;
+    el.style.display = n>0 ? 'flex':'none';
+  });
+}
+
+function starRow(rating, size=14){
+  let html = '';
+  for(let i=1;i<=5;i++){
+    const fill = rating>=i ? 1 : (rating>i-1 ? rating-(i-1) : 0);
+    html += `<span style="position:relative;display:inline-block;width:${size}px;height:${size}px;">
+      <span style="position:absolute;inset:0;color:var(--line-strong);">${icon('star',size)}</span>
+      <span style="position:absolute;inset:0;width:${fill*100}%;overflow:hidden;color:var(--copper-bright);">${icon('star',size)}</span>
+    </span>`;
+  }
+  return `<span style="display:inline-flex;gap:2px;">${html}</span>`;
+}
+
+function materialSwatches(materialKeys, selected, onClick){
+  return `<div style="display:flex;gap:10px;flex-wrap:wrap;">
+    ${materialKeys.map(m=>{
+      const mat = MATERIALS[m];
+      const active = m===selected;
+      return `<button onclick="${onClick}('${m}')" title="${mat.name}" aria-label="${mat.name}" aria-pressed="${active}"
+        style="width:38px;height:38px;border-radius:50%;background:${mat.sw};cursor:pointer;
+        border:2px solid ${active?'var(--copper-bright)':'transparent'};
+        box-shadow:${active?'0 0 0 3px rgba(184,122,75,0.25)':'0 2px 6px rgba(0,0,0,.3)'};
+        transition:transform .25s var(--ease), border-color .25s var(--ease);"
+        onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"></button>`;
+    }).join('')}
+  </div>`;
+}
+
+/* ===================== CHROME: NAV / DRAWERS / OVERLAYS ===================== */
+function renderHeader(){
+  const active = (v)=> State.view===v ? 'color:var(--ivory);' : 'color:var(--text-dim);';
+  return `
+  <header id="site-header" style="position:sticky;top:0;z-index:500;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    background:${State.theme==='dark'?'rgba(21,17,15,0.78)':'rgba(246,239,228,0.82)'};border-bottom:1px solid var(--line);transition:background .4s var(--ease);">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;height:78px;gap:24px;">
+      <a href="#" onclick="navigate('landing');return false;" class="serif" style="font-size:22px;font-weight:600;letter-spacing:.01em;display:flex;align-items:center;gap:10px;flex:none;">
+        <span style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--copper-bright),var(--burgundy));display:inline-flex;align-items:center;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L20 7V17L12 22L4 17V7L12 2Z" stroke="#15110F" stroke-width="1.6"/></svg>
+        </span>
+        Vespera
+      </a>
+
+      <nav aria-label="Main" style="display:flex;align-items:center;gap:32px;flex:1;justify-content:center;" class="nav-desktop">
+        <div class="mega-trigger" style="position:relative;" onmouseenter="$('#mega-menu').style.opacity='1';$('#mega-menu').style.visibility='visible';$('#mega-menu').style.transform='translateY(0)';" onmouseleave="$('#mega-menu').style.opacity='0';$('#mega-menu').style.visibility='hidden';$('#mega-menu').style.transform='translateY(-8px)';">
+          <button style="font-size:13.5px;font-weight:500;${active('catalog')}display:flex;align-items:center;gap:6px;" onclick="navigate('catalog',{cat:'all'})">Shop ${icon('chevron-down',14)}</button>
+          <div id="mega-menu" class="glass" style="position:fixed;left:0;top:78px;width:100%;opacity:0;visibility:hidden;transform:translateY(-8px);
+            transition:opacity .3s var(--ease), transform .3s var(--ease), visibility .3s;border-radius:0;border-top:1px solid var(--line);border-left:none;border-right:none;">
+            <div class="container" style="padding:36px 40px;display:grid;grid-template-columns:repeat(4,1fr);gap:32px;">
+              ${CATEGORIES.map(c=>`
+                <div>
+                  <a href="#" onclick="navigate('catalog',{cat:'${c.id}'});return false;" class="serif" style="font-size:17px;display:block;margin-bottom:6px;">${c.name}</a>
+                  <p style="font-size:12.5px;color:var(--text-dim);line-height:1.5;margin-bottom:14px;">${c.desc}</p>
+                  <a href="#" onclick="navigate('catalog',{cat:'${c.id}'});return false;" class="mono" style="font-size:11px;color:var(--copper-bright);letter-spacing:.05em;">VIEW ALL →</a>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <button style="font-size:13.5px;font-weight:500;${active('catalog')}" onclick="navigate('catalog',{cat:'all',sale:1})">Sale</button>
+        <button style="font-size:13.5px;font-weight:500;${active('landing')}" onclick="navigate('landing');setTimeout(()=>document.getElementById('about-anchor')?.scrollIntoView({behavior:'smooth'}),50);">About</button>
+      </nav>
+
+      <div style="display:flex;align-items:center;gap:10px;flex:none;">
+        <button class="btn-icon nav-search-btn" aria-label="Search" onclick="openSearch()">${icon('search',17)}</button>
+        <button class="btn-icon" aria-label="Toggle dark mode" onclick="toggleTheme()">${icon(State.theme==='dark'?'sun':'moon',17)}</button>
+        <div style="position:relative;">
+          <button class="btn-icon" aria-label="Notifications" onclick="toggleNotifPanel()">${icon('bell',17)}</button>
+          ${State.notifications.some(n=>n.unread) ? `<span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--copper-bright);border:1.5px solid var(--ink);"></span>`:''}
+          ${renderNotifPanel()}
+        </div>
+        <button class="btn-icon" aria-label="Wishlist" onclick="navigate('wishlist')" style="position:relative;">
+          ${icon('heart',17)}
+          ${State.wishlist.length ? `<span class="mono" style="position:absolute;top:-4px;right:-4px;background:var(--burgundy-bright);color:#fff;font-size:9.5px;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;">${State.wishlist.length}</span>`:''}
+        </button>
+        <button class="btn-icon" aria-label="Cart" onclick="openCart()" style="position:relative;">
+          ${icon('shopping-bag',17)}
+          <span class="cart-count mono" style="position:absolute;top:-4px;right:-4px;background:var(--copper-bright);color:var(--ink);font-size:9.5px;width:17px;height:17px;border-radius:50%;display:${cartCount()>0?'flex':'none'};align-items:center;justify-content:center;">${cartCount()}</span>
+        </button>
+        ${State.user
+          ? `<button class="btn-icon" aria-label="Account" onclick="navigate('dashboard')">${icon('user',17)}</button>`
+          : `<button class="btn btn-primary btn-sm nav-login" onclick="navigate('login')">Sign in</button>`}
+        <button class="btn-icon nav-burger" aria-label="Menu" onclick="toggleMobileNav()">${icon('menu',19)}</button>
+      </div>
+    </div>
+  </header>
+  <div id="mobile-nav-overlay" class="overlay" onclick="if(event.target===this)toggleMobileNav()">
+    <div class="drawer" style="width:min(340px,86vw);margin-left:0;">
+      <div style="padding:24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);">
+        <span class="serif" style="font-size:19px;">Menu</span>
+        <button class="btn-icon" onclick="toggleMobileNav()">${icon('x',18)}</button>
+      </div>
+      <div style="padding:24px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;flex:1;">
+        ${CATEGORIES.map(c=>`<button onclick="navigate('catalog',{cat:'${c.id}'});toggleMobileNav();" style="text-align:left;padding:14px 8px;font-size:15px;border-bottom:1px solid var(--line);">${c.name}</button>`).join('')}
+        <button onclick="navigate('catalog',{cat:'all',sale:1});toggleMobileNav();" style="text-align:left;padding:14px 8px;font-size:15px;border-bottom:1px solid var(--line);color:var(--copper-bright);">Sale</button>
+        <button onclick="navigate(${State.user?"'dashboard'":"'login'"});toggleMobileNav();" style="text-align:left;padding:14px 8px;font-size:15px;border-bottom:1px solid var(--line);">${State.user?'My account':'Sign in'}</button>
+        <button onclick="navigate('wishlist');toggleMobileNav();" style="text-align:left;padding:14px 8px;font-size:15px;border-bottom:1px solid var(--line);">Wishlist</button>
+        <button onclick="navigate('admin');toggleMobileNav();" style="text-align:left;padding:14px 8px;font-size:15px;color:var(--text-faint);">Admin dashboard</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleMobileNav(){ $('#mobile-nav-overlay').classList.toggle('open'); }
+
+function toggleTheme(){
+  State.theme = State.theme==='dark' ? 'light' : 'dark';
+  localStorage.setItem('vsp_theme', State.theme);
+  document.documentElement.setAttribute('data-theme', State.theme);
+  renderApp();
+}
+
+function toggleNotifPanel(){ State.notifOpen = !State.notifOpen; renderApp(); }
+function renderNotifPanel(){
+  if(!State.notifOpen) return '';
+  return `<div class="glass" style="position:absolute;top:50px;right:0;width:340px;border-radius:var(--radius-md);overflow:hidden;box-shadow:0 24px 48px -12px rgba(0,0,0,.5);z-index:600;" onclick="event.stopPropagation()">
+    <div style="padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-weight:700;font-size:13.5px;">Notifications</span>
+      <button class="mono" style="font-size:10.5px;color:var(--copper-bright);" onclick="markAllRead()">MARK ALL READ</button>
+    </div>
+    <div style="max-height:340px;overflow-y:auto;">
+      ${State.notifications.map(n=>`
+        <div style="display:flex;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);background:${n.unread?'rgba(184,122,75,0.05)':'transparent'};">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(184,122,75,0.14);color:var(--copper-bright);display:flex;align-items:center;justify-content:center;flex:none;">${icon(n.icon,15)}</div>
+          <div style="flex:1;">
+            <div style="font-size:12.5px;font-weight:600;margin-bottom:2px;">${n.title}</div>
+            <div style="font-size:11.5px;color:var(--text-dim);line-height:1.4;margin-bottom:4px;">${n.msg}</div>
+            <div class="mono" style="font-size:10px;color:var(--text-faint);">${n.time}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+function markAllRead(){ State.notifications.forEach(n=>n.unread=false); renderApp(); }
+
+function openCart(){ State.cartOpen = true; renderCartDrawer(); $('#cart-overlay').classList.add('open'); }
+function closeCart(){ $('#cart-overlay').classList.remove('open'); }
+
+function renderCartDrawer(){
+  const root = $('#overlay-root');
+  const items = State.cart;
+  const subtotal = cartSubtotal();
+  root.innerHTML += items.length>=0 ? `` : '';
+  let html = `<div id="cart-overlay" class="overlay" onclick="if(event.target===this)closeCart()">
+    <div class="drawer">
+      <div style="padding:24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;">
+        <span class="serif" style="font-size:20px;">Your bag (${cartCount()})</span>
+        <button class="btn-icon" onclick="closeCart()" aria-label="Close cart">${icon('x',18)}</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:20px 24px;">
+        ${items.length===0 ? `
+          <div style="text-align:center;padding:60px 20px;">
+            <div style="width:64px;height:64px;border-radius:50%;background:rgba(184,122,75,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--copper-bright);">${icon('shopping-bag',26)}</div>
+            <p class="serif" style="font-size:18px;margin-bottom:8px;">Your bag is empty</p>
+            <p style="font-size:13px;color:var(--text-dim);margin-bottom:22px;">Items you add will appear here.</p>
+            <button class="btn btn-primary btn-sm" onclick="closeCart();navigate('catalog',{cat:'all'})">Browse the catalog</button>
+          </div>` :
+          items.map(it=>{
+            const p = getProduct(it.pid);
+            return `<div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);">
+              <img src="${p.images[0]}" alt="${p.name}" style="width:78px;height:78px;border-radius:var(--radius-sm);object-fit:cover;flex:none;">
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;justify-content:space-between;gap:8px;">
+                  <a href="#" onclick="closeCart();navigate('product',{id:'${p.id}'});return false;" style="font-size:14px;font-weight:600;line-height:1.3;">${p.name}</a>
+                  <button onclick="removeFromCart('${p.id}','${it.material}')" aria-label="Remove" style="color:var(--text-faint);flex:none;">${icon('trash-2',15)}</button>
+                </div>
+                <div class="mono" style="font-size:11px;color:var(--text-dim);margin:4px 0 10px;">${MATERIALS[it.material].name}</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div style="display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:999px;">
+                    <button onclick="updateCartQty('${p.id}','${it.material}',${it.qty-1})" style="width:26px;height:26px;font-size:14px;" aria-label="Decrease quantity">−</button>
+                    <span class="mono" style="font-size:12px;width:24px;text-align:center;">${it.qty}</span>
+                    <button onclick="updateCartQty('${p.id}','${it.material}',${it.qty+1})" style="width:26px;height:26px;font-size:14px;" aria-label="Increase quantity">+</button>
+                  </div>
+                  <span class="mono" style="font-size:13.5px;font-weight:600;">${fmt(p.price*it.qty)}</span>
+                </div>
+              </div>
+            </div>`;
+          }).join('')
+        }
+      </div>
+      ${items.length>0 ? `
+      <div style="padding:24px;border-top:1px solid var(--line);">
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-dim);margin-bottom:8px;">
+          <span>Subtotal</span><span class="mono">${fmt(subtotal)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-faint);margin-bottom:18px;">
+          <span>Shipping & taxes</span><span>Calculated at checkout</span>
+        </div>
+        <button class="btn btn-primary btn-block btn-lg" onclick="closeCart();navigate('checkout');">Checkout — ${fmt(subtotal)}</button>
+        <button class="btn btn-ghost btn-block" style="margin-top:10px;" onclick="closeCart();navigate('cart');">View full bag</button>
+      </div>`:''}
+    </div>
+  </div>`;
+  const existing = document.getElementById('cart-overlay');
+  if(existing) existing.outerHTML = html; else root.insertAdjacentHTML('beforeend', html);
+  refreshIcons();
+  requestAnimationFrame(()=>$('#cart-overlay').classList.add('open'));
+}
+
+function openSearch(){
+  const root = $('#overlay-root');
+  const html = `<div id="search-overlay" class="overlay" style="align-items:flex-start;" onclick="if(event.target===this)closeSearchPanel()">
+    <div class="modal-center glass" style="margin-top:90px;width:min(600px,92vw);">
+      <div style="padding:6px;">
+        <div style="display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);">
+          ${icon('search',18)}
+          <input id="search-input" type="text" placeholder="Search products, materials, categories…" oninput="liveSearch(this.value)"
+            style="flex:1;background:none;border:none;color:var(--ivory);font-size:16px;outline:none;" autofocus>
+          <button class="btn-icon" onclick="closeSearchPanel()" aria-label="Close search">${icon('x',16)}</button>
+        </div>
+        <div id="search-results" style="max-height:50vh;overflow-y:auto;padding:8px;"></div>
+      </div>
+    </div>
+  </div>`;
+  const existing = document.getElementById('search-overlay');
+  if(existing) existing.remove();
+  root.insertAdjacentHTML('beforeend', html);
+  refreshIcons();
+  requestAnimationFrame(()=>{ $('#search-overlay').classList.add('open'); $('#search-input').focus(); });
+}
+function closeSearchPanel(){ const el = $('#search-overlay'); if(el){ el.classList.remove('open'); setTimeout(()=>el.remove(),400);} }
+function liveSearch(q){
+  const results = $('#search-results');
+  if(!q || q.length<1){ results.innerHTML=''; return; }
+  const matches = PRODUCTS.filter(p=>p.name.toLowerCase().includes(q.toLowerCase()) || p.cat.includes(q.toLowerCase())).slice(0,6);
+  if(matches.length===0){ results.innerHTML = `<div style="padding:30px;text-align:center;color:var(--text-dim);font-size:13.5px;">No products match "${q}". Try a category like "audio" or "desk".</div>`; return; }
+  results.innerHTML = matches.map(p=>`
+    <button onclick="closeSearchPanel();navigate('product',{id:'${p.id}'})" style="width:100%;display:flex;align-items:center;gap:14px;padding:10px;border-radius:var(--radius-sm);text-align:left;" onmouseover="this.style.background='rgba(184,122,75,0.08)'" onmouseout="this.style.background='none'">
+      <img src="${p.images[0]}" style="width:46px;height:46px;border-radius:8px;object-fit:cover;">
+      <div style="flex:1;">
+        <div style="font-size:13.5px;font-weight:600;">${p.name}</div>
+        <div class="mono" style="font-size:11px;color:var(--text-dim);">${CATEGORIES.find(c=>c.id===p.cat).name}</div>
+      </div>
+      <span class="mono" style="font-size:13px;">${fmt(p.price)}</span>
+    </button>`).join('');
+}
+
+document.addEventListener('click', (e)=>{
+  if(State.notifOpen && !e.target.closest('[aria-label="Notifications"]') && !e.target.closest('.glass[onclick]')){
+    State.notifOpen = false; renderApp();
+  }
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape'){
+    ['cart-overlay','search-overlay','quickview-overlay','auth-modal-overlay'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('open'); });
+  }
+});
+
+function renderFooter(){
+  return `<footer style="border-top:1px solid var(--line);padding:64px 0 32px;margin-top:auto;">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;" class="footer-grid">
+        <div>
+          <div class="serif" style="font-size:20px;margin-bottom:14px;">Vespera</div>
+          <p style="font-size:13px;color:var(--text-dim);line-height:1.7;max-width:280px;">Considered objects for the desk, the ear, and the everyday carry. Designed quietly, built to last.</p>
+          <div style="display:flex;gap:10px;margin-top:20px;">
+            ${['instagram','twitter','youtube'].map(s=>`<button class="btn-icon" style="width:36px;height:36px;" aria-label="${s}">${icon(s,15)}</button>`).join('')}
+          </div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:16px;">Shop</div>
+          ${CATEGORIES.map(c=>`<button onclick="navigate('catalog',{cat:'${c.id}'})" style="display:block;font-size:13px;color:var(--text-dim);margin-bottom:11px;text-align:left;">${c.name}</button>`).join('')}
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:16px;">Account</div>
+          <button onclick="navigate('login')" style="display:block;font-size:13px;color:var(--text-dim);margin-bottom:11px;">Sign in</button>
+          <button onclick="navigate('dashboard',{tab:'orders'})" style="display:block;font-size:13px;color:var(--text-dim);margin-bottom:11px;">Track an order</button>
+          <button onclick="navigate('wishlist')" style="display:block;font-size:13px;color:var(--text-dim);margin-bottom:11px;">Wishlist</button>
+          <button onclick="navigate('admin')" style="display:block;font-size:13px;color:var(--text-faint);">Admin</button>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:16px;">Stay in touch</div>
+          <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">Quiet, occasional notes on new pieces.</p>
+          <form onsubmit="event.preventDefault();toast('success','Subscribed','You\\'ll hear from us occasionally.');this.reset();" style="display:flex;gap:8px;">
+            <input type="email" required placeholder="Email address" style="flex:1;background:rgba(246,239,228,0.05);border:1px solid var(--line-strong);border-radius:8px;padding:10px 12px;color:var(--ivory);font-size:12.5px;">
+            <button class="btn-icon" type="submit" aria-label="Subscribe" style="background:var(--copper-bright);color:var(--ink);border:none;">${icon('arrow-right',15)}</button>
+          </form>
+        </div>
+      </div>
+      <div class="divider" style="margin-bottom:24px;"></div>
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <span class="mono" style="font-size:11px;color:var(--text-faint);">© 2026 VESPERA STUDIO. ALL RIGHTS RESERVED.</span>
+        <div style="display:flex;gap:20px;">
+          <span class="mono" style="font-size:11px;color:var(--text-faint);">PRIVACY</span>
+          <span class="mono" style="font-size:11px;color:var(--text-faint);">TERMS</span>
+          <span class="mono" style="font-size:11px;color:var(--text-faint);">ACCESSIBILITY</span>
+        </div>
+      </div>
+    </div>
+  </footer>`;
+}
+
+/* ===================== RENDER ENGINE ===================== */
+function viewBody(){
+  switch(State.view){
+    case 'landing': return renderLanding();
+    case 'catalog': return renderCatalog();
+    case 'product': return renderProductDetail();
+    case 'cart': return renderCartPage();
+    case 'checkout': return renderCheckout();
+    case 'login': return renderLogin();
+    case 'register': return renderRegister();
+    case 'forgot': return renderForgot();
+    case 'dashboard': return renderDashboard();
+    case 'wishlist': return renderWishlistPage();
+    case 'order-confirm': return renderOrderConfirm();
+    case 'admin': return renderAdmin();
+    default: return renderLanding();
+  }
+}
+
+function isAppView(){ return ['admin'].includes(State.view) === false; }
+
+function renderApp(){
+  const app = $('#app');
+  const withChrome = !['login','register','forgot'].includes(State.view) && State.view!=='admin';
+  app.innerHTML = `
+    ${withChrome ? renderHeader() : (State.view==='admin' ? '' : '')}
+    <main class="view" style="flex:1;display:flex;flex-direction:column;">
+      ${viewBody()}
+    </main>
+    ${withChrome ? renderFooter() : ''}
+  `;
+  refreshIcons();
+  renderToasts();
+  initScrollReveal();
+  if(typeof afterRenderHook === 'function') afterRenderHook();
+}
+
+function render(){ renderApp(); }
+
+function initScrollReveal(){
+  const items = $all('.reveal');
+  if(!items.length) return;
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); } });
+  }, {threshold:0.15});
+  items.forEach(el=>obs.observe(el));
+}
+
+/* ===================== VIEW: LANDING ===================== */
+function renderLanding(){
+  const featured = PRODUCTS.filter(p=>['p01','p07','p02','p03'].includes(p.id));
+  const bestsellers = PRODUCTS.filter(p=>p.tag==='Bestseller' || p.rating>=4.7).slice(0,4);
+  return `
+  <section style="position:relative;padding:64px 0 0;overflow:hidden;">
+    <div class="container" style="display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center;min-height:78vh;" id="hero-grid">
+      <div style="position:relative;z-index:2;">
+        <div class="eyebrow" style="margin-bottom:24px;">Spring/Summer collection — No. 04</div>
+        <h1 class="serif" style="font-size:clamp(42px,6vw,76px);line-height:1.02;font-weight:500;letter-spacing:-.01em;margin-bottom:24px;">
+          Objects built<br><span style="font-style:italic;color:var(--copper-bright);">to be kept,</span><br>not replaced.
+        </h1>
+        <p style="font-size:16px;color:var(--text-dim);max-width:440px;line-height:1.7;margin-bottom:36px;">
+          Vespera designs the small technology you touch every day — headphones, carry, and desk objects machined from real materials and finished by hand.
+        </p>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-lg" onclick="navigate('catalog',{cat:'all'})">Shop the collection ${icon('arrow-right',15)}</button>
+          <button class="btn btn-ghost btn-lg" onclick="navigate('product',{id:'p01'})">View Aria II</button>
+        </div>
+        <div style="display:flex;gap:36px;margin-top:56px;">
+          <div><div class="serif" style="font-size:26px;">12k+</div><div class="mono" style="font-size:10.5px;color:var(--text-faint);letter-spacing:.08em;">OBJECTS SHIPPED</div></div>
+          <div><div class="serif" style="font-size:26px;">4.8/5</div><div class="mono" style="font-size:10.5px;color:var(--text-faint);letter-spacing:.08em;">AVG. RATING</div></div>
+          <div><div class="serif" style="font-size:26px;">7 yrs</div><div class="mono" style="font-size:10.5px;color:var(--text-faint);letter-spacing:.08em;">AVG. PRODUCT LIFE</div></div>
+        </div>
+      </div>
+      <div style="position:relative;height:560px;" class="hero-visual">
+        <div style="position:absolute;inset:0;border-radius:32px;overflow:hidden;background:linear-gradient(155deg,var(--surface),var(--ink-soft));">
+          <img src="${img('hero-aria',900,1100)}" alt="Aria II Headphones in walnut finish" style="width:100%;height:100%;object-fit:cover;opacity:.92;">
+        </div>
+        <div class="glass reveal in" style="position:absolute;bottom:28px;left:-28px;padding:18px 22px;border-radius:var(--radius-md);max-width:230px;box-shadow:0 24px 48px -16px rgba(0,0,0,.5);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="width:30px;height:30px;border-radius:50%;background:${MATERIALS.walnut.sw};flex:none;"></span>
+            <span style="font-size:13px;font-weight:600;">Aria II — Walnut</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="mono" style="font-size:15px;font-weight:600;color:var(--copper-bright);">${fmt(429)}</span>
+            ${starRow(4.8,12)}
+          </div>
+        </div>
+        <div class="glass" style="position:absolute;top:24px;right:-20px;padding:14px 16px;border-radius:var(--radius-md);display:flex;align-items:center;gap:10px;">
+          ${icon('truck',16)}<span style="font-size:12px;">Free shipping over $150</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:120px 0 40px;">
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;flex-wrap:wrap;gap:16px;">
+        <div>
+          <div class="eyebrow" style="margin-bottom:14px;">Shop by world</div>
+          <h2 class="serif" style="font-size:clamp(28px,3.4vw,40px);font-weight:500;">Four categories. No clutter.</h2>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;" class="cat-grid">
+        ${CATEGORIES.map((c,i)=>`
+          <button onclick="navigate('catalog',{cat:'${c.id}'})" class="card reveal" style="aspect-ratio:3/4;position:relative;overflow:hidden;text-align:left;padding:0;cursor:pointer;"
+            onmouseover="this.querySelector('img').style.transform='scale(1.07)'" onmouseout="this.querySelector('img').style.transform='scale(1)'">
+            <img src="${img('cat-'+c.id,500,700)}" alt="" style="width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease);">
+            <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(21,17,15,0.85), rgba(21,17,15,0.1) 50%);"></div>
+            <div style="position:absolute;bottom:0;left:0;padding:22px;">
+              <div class="serif" style="font-size:21px;color:#fff;margin-bottom:6px;">${c.name}</div>
+              <div class="mono" style="font-size:10.5px;color:rgba(255,255,255,.7);letter-spacing:.06em;">EXPLORE →</div>
+            </div>
+          </button>`).join('')}
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:100px 0;">
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;flex-wrap:wrap;gap:16px;">
+        <div>
+          <div class="eyebrow" style="margin-bottom:14px;">Featured</div>
+          <h2 class="serif" style="font-size:clamp(28px,3.4vw,40px);font-weight:500;">This season's collection</h2>
+        </div>
+        <button class="btn btn-ghost" onclick="navigate('catalog',{cat:'all'})">View all products</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;" class="product-grid">
+        ${featured.map(productCard).join('')}
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:40px 0 120px;">
+    <div class="container">
+      <div class="card reveal" style="background:linear-gradient(135deg, var(--burgundy) 0%, var(--ink-soft) 60%);border:none;border-radius:32px;padding:72px 60px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:40px;overflow:hidden;position:relative;">
+        <div style="position:absolute;right:-60px;top:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle, rgba(184,122,75,0.25), transparent 70%);"></div>
+        <div style="position:relative;z-index:1;">
+          <div class="eyebrow" style="margin-bottom:16px;color:var(--copper-bright);">Members get more</div>
+          <h2 class="serif" style="font-size:clamp(26px,3.2vw,38px);color:#fff;margin-bottom:14px;max-width:480px;">Create an account for early access and member pricing.</h2>
+          <p style="color:rgba(246,239,228,.7);font-size:14.5px;max-width:420px;">Track orders, save wishlists across devices, and get first access to limited finishes.</p>
+        </div>
+        <button class="btn btn-primary btn-lg" style="position:relative;z-index:1;" onclick="navigate('register')">Create free account</button>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:0 0 120px;" id="about-anchor">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;" class="about-grid">
+        <div class="reveal">
+          <div class="eyebrow" style="margin-bottom:18px;">Bestsellers</div>
+          <h2 class="serif" style="font-size:clamp(26px,3vw,36px);margin-bottom:20px;">What people keep coming back for</h2>
+          <p style="color:var(--text-dim);font-size:14.5px;line-height:1.7;margin-bottom:28px;max-width:440px;">
+            Every Vespera object is designed to outlast the trend cycle — built from materials that age well and repaired, not replaced, when something wears out.
+          </p>
+          <button class="btn btn-dark" onclick="navigate('catalog',{cat:'all',sort:'rating'})">Shop bestsellers ${icon('arrow-right',15)}</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          ${bestsellers.map(p=>`
+            <button onclick="navigate('product',{id:'${p.id}'})" class="card reveal" style="padding:16px;text-align:left;cursor:pointer;">
+              <img src="${p.images[0]}" alt="${p.name}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--radius-sm);margin-bottom:12px;">
+              <div style="font-size:12.5px;font-weight:600;margin-bottom:4px;">${p.name}</div>
+              <div class="mono" style="font-size:12px;color:var(--copper-bright);">${fmt(p.price)}</div>
+            </button>`).join('')}
+        </div>
+      </div>
+    </div>
+  </section>
+  `;
+}
+
+/* shared product card used across landing/catalog/recs */
+function productCard(p){
+  const wished = State.wishlist.includes(p.id);
+  const outOfStock = p.stock===0;
+  return `
+  <div class="card reveal" style="overflow:hidden;display:flex;flex-direction:column;" onmouseover="this.style.borderColor='var(--copper-dim)';this.style.transform='translateY(-4px)';this.querySelector('.pc-img').style.transform='scale(1.06)'" onmouseout="this.style.borderColor='var(--line)';this.style.transform='translateY(0)';this.querySelector('.pc-img').style.transform='scale(1)'">
+    <div style="position:relative;aspect-ratio:1;overflow:hidden;cursor:pointer;" onclick="navigate('product',{id:'${p.id}'})">
+      <img class="pc-img" src="${p.images[0]}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease);${outOfStock?'opacity:.45;':''}">
+      ${p.tag ? `<span class="badge ${p.tag==='Sale'?'badge-burgundy':'badge-copper'}" style="position:absolute;top:12px;left:12px;">${p.tag}</span>` : ''}
+      ${outOfStock ? `<span class="badge badge-ivory" style="position:absolute;top:12px;left:12px;">Out of stock</span>` : ''}
+      <button onclick="event.stopPropagation();toggleWishlist('${p.id}')" aria-label="Toggle wishlist" aria-pressed="${wished}"
+        style="position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;background:rgba(21,17,15,0.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;color:${wished?'var(--copper-bright)':'#fff'};">
+        <i data-lucide="heart" style="width:15px;height:15px;${wished?'fill:currentColor;':''}"></i>
+      </button>
+      <button onclick="event.stopPropagation();openQuickView('${p.id}')" class="mono"
+        style="position:absolute;bottom:0;left:0;right:0;padding:10px;background:rgba(21,17,15,0.7);backdrop-filter:blur(8px);color:#fff;font-size:10.5px;letter-spacing:.08em;opacity:0;transition:opacity .3s var(--ease);"
+        onmouseover="this.style.opacity='1'">QUICK VIEW</button>
+    </div>
+    <div style="padding:18px;flex:1;display:flex;flex-direction:column;cursor:pointer;" onclick="navigate('product',{id:'${p.id}'})">
+      <div class="mono" style="font-size:10.5px;color:var(--text-faint);letter-spacing:.06em;margin-bottom:6px;">${CATEGORIES.find(c=>c.id===p.cat).name.toUpperCase()}</div>
+      <div style="font-size:14.5px;font-weight:600;margin-bottom:8px;flex:1;">${p.name}</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+        ${starRow(p.rating,12)}<span class="mono" style="font-size:10.5px;color:var(--text-faint);">(${p.reviews})</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="mono" style="font-size:15px;font-weight:700;color:${p.compareAt?'var(--copper-bright)':'var(--ivory)'};">${fmt(p.price)}</span>
+        ${p.compareAt ? `<span class="mono" style="font-size:12.5px;color:var(--text-faint);text-decoration:line-through;">${fmt(p.compareAt)}</span>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ===================== VIEW: CATALOG ===================== */
+function getFilteredProducts(){
+  let list = [...PRODUCTS];
+  const f = State.filters;
+  if(f.cat && f.cat!=='all') list = list.filter(p=>p.cat===f.cat);
+  if(State.params.sale) list = list.filter(p=>p.compareAt);
+  if(f.search) list = list.filter(p=>p.name.toLowerCase().includes(f.search.toLowerCase()));
+  if(f.materials.length) list = list.filter(p=>p.materials.some(m=>f.materials.includes(m)));
+  list = list.filter(p=>p.price>=f.price[0] && p.price<=f.price[1]);
+  switch(f.sort){
+    case 'price-asc': list.sort((a,b)=>a.price-b.price); break;
+    case 'price-desc': list.sort((a,b)=>b.price-a.price); break;
+    case 'rating': list.sort((a,b)=>b.rating-a.rating); break;
+    case 'new': list = list.filter(p=>p.tag==='New').concat(list.filter(p=>p.tag!=='New')); break;
+    default: break;
+  }
+  return list;
+}
+
+function renderCatalog(){
+  if(State.params.cat) State.filters.cat = State.params.cat;
+  const list = getFilteredProducts();
+  const activeCat = CATEGORIES.find(c=>c.id===State.filters.cat);
+  return `
+  <section style="padding:48px 0 100px;">
+    <div class="container">
+      <div style="margin-bottom:8px;" class="mono" style="font-size:11px;color:var(--text-faint);">
+        <button onclick="navigate('landing')" style="color:var(--text-faint);">HOME</button> / <span style="color:var(--copper-bright);">${State.params.sale ? 'SALE' : (activeCat?activeCat.name.toUpperCase():'ALL PRODUCTS')}</span>
+      </div>
+      <h1 class="serif" style="font-size:clamp(30px,4vw,46px);font-weight:500;margin:10px 0 36px;">
+        ${State.params.sale ? 'Current sale' : (activeCat?activeCat.name:'All products')}
+      </h1>
+
+      <div style="display:grid;grid-template-columns:240px 1fr;gap:40px;" class="catalog-grid">
+        <aside class="catalog-filters">
+          <div style="margin-bottom:32px;">
+            <div class="eyebrow" style="margin-bottom:14px;">Category</div>
+            <button onclick="setCatalogFilter('cat','all')" style="display:block;width:100%;text-align:left;padding:8px 0;font-size:13.5px;color:${State.filters.cat==='all'?'var(--ivory)':'var(--text-dim)'};font-weight:${State.filters.cat==='all'?'700':'400'};">All products</button>
+            ${CATEGORIES.map(c=>`<button onclick="setCatalogFilter('cat','${c.id}')" style="display:block;width:100%;text-align:left;padding:8px 0;font-size:13.5px;color:${State.filters.cat===c.id?'var(--ivory)':'var(--text-dim)'};font-weight:${State.filters.cat===c.id?'700':'400'};">${c.name}</button>`).join('')}
+          </div>
+          <div style="margin-bottom:32px;">
+            <div class="eyebrow" style="margin-bottom:14px;">Price</div>
+            <input type="range" min="0" max="700" step="10" value="${State.filters.price[1]}" oninput="setCatalogPrice(this.value)" style="width:100%;accent-color:var(--copper);">
+            <div style="display:flex;justify-content:space-between;" class="mono"><span style="font-size:11.5px;color:var(--text-dim);">$0</span><span style="font-size:11.5px;color:var(--text-dim);">${fmt(State.filters.price[1])}</span></div>
+          </div>
+          <div style="margin-bottom:32px;">
+            <div class="eyebrow" style="margin-bottom:14px;">Material</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              ${Object.keys(MATERIALS).map(m=>{
+                const active = State.filters.materials.includes(m);
+                return `<button onclick="toggleMaterialFilter('${m}')" title="${MATERIALS[m].name}" style="width:30px;height:30px;border-radius:50%;background:${MATERIALS[m].sw};border:2px solid ${active?'var(--copper-bright)':'transparent'};opacity:${active?'1':'.85'};"></button>`;
+              }).join('')}
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-sm btn-block" onclick="resetCatalogFilters()">Reset filters</button>
+        </aside>
+
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+            <span style="font-size:13px;color:var(--text-dim);">${list.length} product${list.length!==1?'s':''}</span>
+            <select onchange="setCatalogFilter('sort',this.value)" style="background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:9px 14px;font-size:12.5px;color:var(--ivory);">
+              <option value="featured" ${State.filters.sort==='featured'?'selected':''}>Featured</option>
+              <option value="new" ${State.filters.sort==='new'?'selected':''}>Newest</option>
+              <option value="price-asc" ${State.filters.sort==='price-asc'?'selected':''}>Price: Low to High</option>
+              <option value="price-desc" ${State.filters.sort==='price-desc'?'selected':''}>Price: High to Low</option>
+              <option value="rating" ${State.filters.sort==='rating'?'selected':''}>Top rated</option>
+            </select>
+          </div>
+          ${list.length===0 ? `
+            <div style="text-align:center;padding:80px 20px;">
+              <div style="width:64px;height:64px;border-radius:50%;background:rgba(184,122,75,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--copper-bright);">${icon('search-x',26)}</div>
+              <p class="serif" style="font-size:19px;margin-bottom:8px;">No products match these filters</p>
+              <p style="font-size:13px;color:var(--text-dim);margin-bottom:20px;">Try widening the price range or clearing a material filter.</p>
+              <button class="btn btn-primary btn-sm" onclick="resetCatalogFilters()">Reset filters</button>
+            </div>` : `
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;" class="product-grid-3">
+              ${list.map(productCard).join('')}
+            </div>`}
+        </div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function setCatalogFilter(key,val){ State.filters[key]=val; State.params={}; renderApp(); }
+function setCatalogPrice(val){ State.filters.price=[0,parseInt(val)]; renderApp(); }
+function toggleMaterialFilter(m){
+  const i = State.filters.materials.indexOf(m);
+  if(i>-1) State.filters.materials.splice(i,1); else State.filters.materials.push(m);
+  renderApp();
+}
+function resetCatalogFilters(){ State.filters={cat:'all',sort:'featured',price:[0,700],search:'',materials:[]}; State.params={}; renderApp(); }
+
+/* Quick view modal */
+function openQuickView(pid){
+  const p = getProduct(pid);
+  const root = $('#overlay-root');
+  const html = `<div id="quickview-overlay" class="overlay" onclick="if(event.target===this)closeQuickView()">
+    <div class="modal-center glass" style="width:min(820px,94vw);">
+      <button class="btn-icon" onclick="closeQuickView()" style="position:absolute;top:16px;right:16px;background:var(--ink);z-index:2;" aria-label="Close">${icon('x',16)}</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;" class="qv-grid">
+        <img src="${p.images[0]}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;min-height:320px;border-radius:var(--radius-lg) 0 0 var(--radius-lg);">
+        <div style="padding:32px;">
+          <div class="mono" style="font-size:10.5px;color:var(--text-faint);letter-spacing:.06em;margin-bottom:8px;">${CATEGORIES.find(c=>c.id===p.cat).name.toUpperCase()}</div>
+          <h3 class="serif" style="font-size:24px;margin-bottom:10px;">${p.name}</h3>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">${starRow(p.rating,13)}<span class="mono" style="font-size:11px;color:var(--text-faint);">(${p.reviews} reviews)</span></div>
+          <div class="mono" style="font-size:20px;font-weight:700;color:var(--copper-bright);margin-bottom:16px;">${fmt(p.price)}</div>
+          <p style="font-size:13px;color:var(--text-dim);line-height:1.6;margin-bottom:20px;">${p.desc}</p>
+          <div style="margin-bottom:24px;">${materialSwatches(p.materials, p.materials[0], 'qvSelectMaterial')}</div>
+          <button class="btn btn-primary btn-block" onclick="addToCart('${p.id}', window.__qvMaterial||'${p.materials[0]}');closeQuickView();">Add to bag — ${fmt(p.price)}</button>
+          <button class="btn btn-ghost btn-block" style="margin-top:10px;" onclick="closeQuickView();navigate('product',{id:'${p.id}'})">View full details</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  const existing = document.getElementById('quickview-overlay');
+  if(existing) existing.remove();
+  root.insertAdjacentHTML('beforeend', html);
+  window.__qvMaterial = p.materials[0];
+  refreshIcons();
+  requestAnimationFrame(()=>$('#quickview-overlay').classList.add('open'));
+}
+function qvSelectMaterial(m){ window.__qvMaterial = m; openQuickViewRefreshSwatch(m); }
+function openQuickViewRefreshSwatch(m){
+  $all('#quickview-overlay button[aria-pressed]').forEach(b=>{});
+}
+function closeQuickView(){
+  const el = $('#quickview-overlay');
+  if(el){ el.classList.remove('open'); setTimeout(()=>el.remove(),400); }
+}
+/* ===================== VIEW: PRODUCT DETAIL ===================== */
+let pdpState = { activeImg:0, material:null, qty:1, tab:'description' };
+
+function renderProductDetail(){
+  const p = getProduct(State.params.id) || PRODUCTS[0];
+  if(pdpState.pid !== p.id){ pdpState = {pid:p.id, activeImg:0, material:p.materials[0], qty:1, tab:'description', realReviews:null}; loadProductReviews(p.id); }
+  const wished = State.wishlist.includes(p.id);
+  const reviews = (pdpState.realReviews && pdpState.realReviews.length) ? pdpState.realReviews : genReviews(p.id, 5);
+  const related = PRODUCTS.filter(r=>r.cat===p.cat && r.id!==p.id).slice(0,4);
+  const recs = PRODUCTS.filter(r=>r.id!==p.id).sort((a,b)=>b.rating-a.rating).slice(0,4);
+
+  return `
+  <section style="padding:32px 0 80px;">
+    <div class="container">
+      <div class="mono" style="font-size:11px;color:var(--text-faint);margin-bottom:24px;">
+        <button onclick="navigate('landing')" style="color:var(--text-faint);">HOME</button> /
+        <button onclick="navigate('catalog',{cat:'${p.cat}'})" style="color:var(--text-faint);">${CATEGORIES.find(c=>c.id===p.cat).name.toUpperCase()}</button> /
+        <span style="color:var(--copper-bright);">${p.name.toUpperCase()}</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px;margin-bottom:90px;" class="pdp-grid">
+        <div>
+          <div class="card" style="aspect-ratio:1;overflow:hidden;margin-bottom:14px;">
+            <img id="pdp-main-img" src="${p.images[pdpState.activeImg]}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;transition:opacity .3s var(--ease);">
+          </div>
+          <div style="display:flex;gap:12px;">
+            ${p.images.map((im,i)=>`<button onclick="pdpSetImg(${i})" class="card" style="width:76px;height:76px;overflow:hidden;padding:0;border-color:${i===pdpState.activeImg?'var(--copper-bright)':'var(--line)'};">
+              <img src="${im}" style="width:100%;height:100%;object-fit:cover;"></button>`).join('')}
+          </div>
+        </div>
+
+        <div>
+          ${p.tag ? `<span class="badge ${p.tag==='Sale'?'badge-burgundy':'badge-copper'}" style="margin-bottom:14px;">${p.tag}</span>`:''}
+          <h1 class="serif" style="font-size:clamp(28px,3.6vw,40px);font-weight:500;margin-bottom:12px;">${p.name}</h1>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+            ${starRow(p.rating,15)}
+            <span class="mono" style="font-size:12px;color:var(--text-dim);">${p.rating} · ${p.reviews} reviews</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:24px;">
+            <span class="mono" style="font-size:26px;font-weight:700;color:${p.compareAt?'var(--copper-bright)':'var(--ivory)'};">${fmt(p.price)}</span>
+            ${p.compareAt ? `<span class="mono" style="font-size:16px;color:var(--text-faint);text-decoration:line-through;">${fmt(p.compareAt)}</span><span class="badge badge-burgundy">SAVE ${Math.round((1-p.price/p.compareAt)*100)}%</span>`:''}
+          </div>
+          <p style="font-size:14.5px;color:var(--text-dim);line-height:1.7;margin-bottom:28px;">${p.desc}</p>
+
+          <div style="margin-bottom:28px;">
+            <div class="eyebrow" style="margin-bottom:12px;">Finish — ${MATERIALS[pdpState.material].name}</div>
+            ${materialSwatches(p.materials, pdpState.material, 'pdpSelectMaterial')}
+          </div>
+
+          <div style="display:flex;gap:14px;margin-bottom:18px;">
+            <div style="display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:999px;">
+              <button onclick="pdpSetQty(${pdpState.qty-1})" style="width:44px;height:48px;font-size:16px;" aria-label="Decrease quantity">−</button>
+              <span class="mono" style="font-size:14px;width:34px;text-align:center;">${pdpState.qty}</span>
+              <button onclick="pdpSetQty(${pdpState.qty+1})" style="width:44px;height:48px;font-size:16px;" aria-label="Increase quantity">+</button>
+            </div>
+            <button class="btn btn-primary btn-lg" style="flex:1;" ${p.stock===0?'disabled':''} onclick="addToCart('${p.id}', pdpState.material, pdpState.qty)">
+              ${p.stock===0?'Out of stock':`Add to bag — ${fmt(p.price*pdpState.qty)}`}
+            </button>
+            <button class="btn-icon" style="width:48px;height:48px;" onclick="toggleWishlist('${p.id}');renderApp();" aria-label="Toggle wishlist">
+              <i data-lucide="heart" style="width:18px;height:18px;color:${wished?'var(--copper-bright)':'currentColor'};${wished?'fill:currentColor;':''}"></i>
+            </button>
+          </div>
+          ${p.stock>0 && p.stock<15 ? `<div style="font-size:12px;color:var(--copper-bright);margin-bottom:18px;">${icon('flame',13)} Only ${p.stock} left in this finish</div>`:''}
+
+          <div style="display:flex;gap:20px;padding-top:20px;border-top:1px solid var(--line);">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim);">${icon('truck',16)}Free shipping over $150</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim);">${icon('rotate-ccw',16)}30-day returns</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim);">${icon('shield-check',16)}2-year warranty</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:90px;">
+        <div style="display:flex;gap:32px;border-bottom:1px solid var(--line);margin-bottom:32px;">
+          ${['description','specifications','reviews'].map(t=>`
+            <button onclick="pdpSetTab('${t}')" style="padding:14px 0;font-size:13.5px;font-weight:600;text-transform:capitalize;border-bottom:2px solid ${pdpState.tab===t?'var(--copper-bright)':'transparent'};color:${pdpState.tab===t?'var(--ivory)':'var(--text-dim)'};">${t}${t==='reviews'?` (${p.reviews})`:''}</button>`).join('')}
+        </div>
+        ${pdpState.tab==='description' ? `<p style="font-size:14.5px;color:var(--text-dim);line-height:1.8;max-width:680px;">${p.desc} Every unit is inspected by hand before it ships, and finished with materials chosen to age rather than degrade — the walnut will darken, the leather will soften, and the copper will develop a patina that's entirely its own.</p>` : ''}
+        ${pdpState.tab==='specifications' ? `
+          <div style="max-width:560px;">
+            ${Object.entries(p.specs).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line);"><span style="font-size:13px;color:var(--text-dim);">${k}</span><span class="mono" style="font-size:13px;">${v}</span></div>`).join('')}
+          </div>` : ''}
+        ${pdpState.tab==='reviews' ? `
+          <div style="display:grid;grid-template-columns:280px 1fr;gap:48px;" class="reviews-grid">
+            <div>
+              <div class="serif" style="font-size:48px;margin-bottom:8px;">${p.rating}</div>
+              ${starRow(p.rating,16)}
+              <div style="font-size:12.5px;color:var(--text-dim);margin:8px 0 24px;">Based on ${p.reviews} reviews</div>
+              <button class="btn btn-ghost btn-block" onclick="openWriteReview('${p.id}')">Write a review</button>
+            </div>
+            <div>
+              ${reviews.map(r=>`
+                <div style="padding-bottom:24px;margin-bottom:24px;border-bottom:1px solid var(--line);">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <div style="font-weight:600;font-size:13.5px;">${r.name}</div>
+                    <span class="mono" style="font-size:11px;color:var(--text-faint);">${r.days}d ago</span>
+                  </div>
+                  ${starRow(r.rating,12)}
+                  <div style="font-weight:600;font-size:13.5px;margin:10px 0 4px;">${r.title}</div>
+                  <p style="font-size:13px;color:var(--text-dim);line-height:1.6;">${r.body}</p>
+                </div>`).join('')}
+            </div>
+          </div>` : ''}
+      </div>
+
+      <div style="margin-bottom:90px;">
+        <div class="eyebrow" style="margin-bottom:16px;">Pairs well with</div>
+        <h2 class="serif" style="font-size:28px;margin-bottom:32px;">Complete the set</h2>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;" class="product-grid">${related.map(productCard).join('')}</div>
+      </div>
+
+      <div>
+        <div class="eyebrow" style="margin-bottom:16px;">${icon('sparkles',13)} Curated for you</div>
+        <h2 class="serif" style="font-size:28px;margin-bottom:32px;">Recommended based on your browsing</h2>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;" class="product-grid">${recs.map(productCard).join('')}</div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function pdpSetImg(i){ pdpState.activeImg=i; renderApp(); }
+function pdpSelectMaterial(m){ pdpState.material=m; renderApp(); }
+function pdpSetQty(q){ pdpState.qty=clamp(q,1,9); renderApp(); }
+function pdpSetTab(t){ pdpState.tab=t; renderApp(); }
+/* ===================== VIEW: CART PAGE ===================== */
+function renderCartPage(){
+  const items = State.cart;
+  const subtotal = cartSubtotal();
+  const promo = State.checkoutData.promo;
+  const discount = promo ? (promo.type==='percent' ? subtotal*promo.value/100 : promo.type==='fixed' ? promo.value : 0) : 0;
+  const shipping = subtotal>150 || (promo&&promo.type==='shipping') ? 0 : 14;
+  const total = Math.max(0, subtotal - discount) + shipping;
+
+  return `
+  <section style="padding:48px 0 100px;">
+    <div class="container">
+      <h1 class="serif" style="font-size:clamp(28px,3.6vw,42px);margin-bottom:36px;">Your bag</h1>
+      ${items.length===0 ? `
+        <div style="text-align:center;padding:100px 20px;">
+          <div style="width:72px;height:72px;border-radius:50%;background:rgba(184,122,75,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;color:var(--copper-bright);">${icon('shopping-bag',30)}</div>
+          <p class="serif" style="font-size:21px;margin-bottom:10px;">Your bag is empty</p>
+          <p style="font-size:14px;color:var(--text-dim);margin-bottom:24px;">Browse the catalog to find your next object.</p>
+          <button class="btn btn-primary" onclick="navigate('catalog',{cat:'all'})">Shop the collection</button>
+        </div>` : `
+      <div style="display:grid;grid-template-columns:1fr 360px;gap:48px;" class="cart-page-grid">
+        <div>
+          ${items.map(it=>{
+            const p = getProduct(it.pid);
+            return `<div class="card" style="display:flex;gap:18px;padding:20px;margin-bottom:16px;">
+              <img src="${p.images[0]}" alt="${p.name}" style="width:100px;height:100px;border-radius:var(--radius-sm);object-fit:cover;flex:none;cursor:pointer;" onclick="navigate('product',{id:'${p.id}'})">
+              <div style="flex:1;">
+                <div style="display:flex;justify-content:space-between;">
+                  <a href="#" onclick="navigate('product',{id:'${p.id}'});return false;" style="font-size:16px;font-weight:600;">${p.name}</a>
+                  <span class="mono" style="font-size:15px;font-weight:700;">${fmt(p.price*it.qty)}</span>
+                </div>
+                <div class="mono" style="font-size:11.5px;color:var(--text-dim);margin:6px 0 16px;">${MATERIALS[it.material].name} · ${fmt(p.price)} each</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div style="display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:999px;">
+                    <button onclick="updateCartQty('${p.id}','${it.material}',${it.qty-1})" style="width:32px;height:32px;" aria-label="Decrease">−</button>
+                    <span class="mono" style="font-size:13px;width:30px;text-align:center;">${it.qty}</span>
+                    <button onclick="updateCartQty('${p.id}','${it.material}',${it.qty+1})" style="width:32px;height:32px;" aria-label="Increase">+</button>
+                  </div>
+                  <button onclick="removeFromCart('${p.id}','${it.material}')" style="font-size:12px;color:var(--text-faint);display:flex;align-items:center;gap:6px;">${icon('trash-2',14)}Remove</button>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div>
+          <div class="card" style="padding:24px;position:sticky;top:100px;">
+            <h3 class="serif" style="font-size:18px;margin-bottom:20px;">Order summary</h3>
+            <div style="display:flex;gap:8px;margin-bottom:18px;">
+              <input id="promo-input" type="text" placeholder="Promo code" style="flex:1;background:rgba(246,239,228,0.04);border:1px solid var(--line-strong);border-radius:8px;padding:11px 13px;color:var(--ivory);font-size:13px;">
+              <button class="btn btn-ghost btn-sm" onclick="applyPromo()">Apply</button>
+            </div>
+            ${promo ? `<div class="badge badge-success" style="margin-bottom:16px;">${icon('check',11)} ${promo.code} applied</div>` : ''}
+            <div style="display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:10px;"><span style="color:var(--text-dim);">Subtotal</span><span class="mono">${fmt(subtotal)}</span></div>
+            ${discount>0?`<div style="display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:10px;color:var(--copper-bright);"><span>Discount</span><span class="mono">−${fmt(discount)}</span></div>`:''}
+            <div style="display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:18px;"><span style="color:var(--text-dim);">Shipping</span><span class="mono">${shipping===0?'Free':fmt(shipping)}</span></div>
+            <div class="divider" style="margin-bottom:18px;"></div>
+            <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:700;margin-bottom:24px;"><span>Total</span><span class="mono">${fmt(total)}</span></div>
+            <button class="btn btn-primary btn-block btn-lg" onclick="navigate('checkout')">Proceed to checkout ${icon('arrow-right',15)}</button>
+          </div>
+        </div>
+      </div>`}
+    </div>
+  </section>`;
+}
+
+async function applyPromo(){
+  const code = $('#promo-input').value.trim().toUpperCase();
+  if(!code){ return; }
+  try{
+    const data = await apiFetch('/promos/validate', {method:'POST', body: JSON.stringify({code})});
+    const found = normalizePromo(data);
+    State.checkoutData.promo = found;
+    toast('success','Promo applied', `${found.code} — ${found.type==='percent'?found.value+'% off':found.type==='fixed'?fmt(found.value)+' off':'free shipping'}`);
+  }catch(e){ toast('error','Invalid code', e.message); }
+  renderApp();
+}
+
+/* ===================== VIEW: CHECKOUT ===================== */
+function renderCheckout(){
+  if(State.cart.length===0 && State.checkoutStep===1){
+    return `<section style="padding:100px 0;"><div class="container" style="text-align:center;">
+      <p class="serif" style="font-size:22px;margin-bottom:16px;">Your bag is empty</p>
+      <button class="btn btn-primary" onclick="navigate('catalog',{cat:'all'})">Shop the collection</button>
+    </div></section>`;
+  }
+  const steps = ['Shipping','Payment','Review'];
+  const subtotal = cartSubtotal();
+  const promo = State.checkoutData.promo;
+  const discount = promo ? (promo.type==='percent' ? subtotal*promo.value/100 : promo.type==='fixed' ? promo.value : 0) : 0;
+  const shipping = subtotal>150 || (promo&&promo.type==='shipping') ? 0 : 14;
+  const total = Math.max(0, subtotal-discount) + shipping;
+
+  return `
+  <section style="padding:48px 0 100px;">
+    <div class="container" style="max-width:1100px;">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:48px;">
+        ${steps.map((s,i)=>{
+          const n=i+1; const active = State.checkoutStep===n; const done = State.checkoutStep>n;
+          return `<div style="display:flex;align-items:center;gap:10px;">
+            <div class="mono" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;
+              background:${done?'var(--copper-bright)':active?'transparent':'var(--surface)'};color:${done?'var(--ink)':active?'var(--copper-bright)':'var(--text-faint)'};
+              border:1.5px solid ${active||done?'var(--copper-bright)':'var(--line-strong)'};">${done?icon('check',13):n}</div>
+            <span style="font-size:13px;font-weight:${active?'700':'400'};color:${active?'var(--ivory)':'var(--text-dim)'};">${s}</span>
+          </div>${i<steps.length-1?`<div style="width:40px;height:1px;background:var(--line-strong);"></div>`:''}`;
+        }).join('')}
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 360px;gap:48px;" class="cart-page-grid">
+        <div class="card" style="padding:32px;">
+          ${State.checkoutStep===1 ? checkoutStepShipping() : ''}
+          ${State.checkoutStep===2 ? checkoutStepPayment() : ''}
+          ${State.checkoutStep===3 ? checkoutStepReview() : ''}
+        </div>
+        <div>
+          <div class="card" style="padding:24px;position:sticky;top:100px;">
+            <h3 class="serif" style="font-size:17px;margin-bottom:18px;">Order summary</h3>
+            ${State.cart.map(it=>{ const p=getProduct(it.pid); return `
+              <div style="display:flex;gap:12px;margin-bottom:14px;">
+                <img src="${p.images[0]}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;flex:none;">
+                <div style="flex:1;font-size:12.5px;">
+                  <div style="font-weight:600;">${p.name}</div>
+                  <div class="mono" style="color:var(--text-faint);font-size:11px;">${MATERIALS[it.material].name} × ${it.qty}</div>
+                </div>
+                <span class="mono" style="font-size:12.5px;">${fmt(p.price*it.qty)}</span>
+              </div>`;}).join('')}
+            <div class="divider" style="margin:14px 0;"></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;"><span style="color:var(--text-dim);">Subtotal</span><span class="mono">${fmt(subtotal)}</span></div>
+            ${discount>0?`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;color:var(--copper-bright);"><span>Discount</span><span class="mono">−${fmt(discount)}</span></div>`:''}
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:14px;"><span style="color:var(--text-dim);">Shipping</span><span class="mono">${shipping===0?'Free':fmt(shipping)}</span></div>
+            <div class="divider" style="margin-bottom:14px;"></div>
+            <div style="display:flex;justify-content:space-between;font-size:17px;font-weight:700;"><span>Total</span><span class="mono">${fmt(total)}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function checkoutStepShipping(){
+  const d = State.checkoutData.shipping;
+  return `
+  <h2 class="serif" style="font-size:22px;margin-bottom:24px;">Shipping address</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="field"><label>Full name</label><input id="ship-name" value="${d.name||''}" placeholder="Jordan Lee"></div>
+    <div class="field"><label>Email</label><input id="ship-email" type="email" value="${d.email||''}" placeholder="jordan@email.com"></div>
+  </div>
+  <div class="field"><label>Address</label><input id="ship-address" value="${d.address||''}" placeholder="123 Birch Street"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+    <div class="field"><label>City</label><input id="ship-city" value="${d.city||''}" placeholder="Austin"></div>
+    <div class="field"><label>State</label><input id="ship-state" value="${d.state||''}" placeholder="TX"></div>
+    <div class="field"><label>ZIP</label><input id="ship-zip" value="${d.zip||''}" placeholder="78701"></div>
+  </div>
+  <div class="field"><label>Shipping method</label>
+    <select id="ship-method">
+      <option value="standard">Standard — 5-7 days — Free over $150</option>
+      <option value="express">Express — 2-3 days — $24</option>
+    </select>
+  </div>
+  <button class="btn btn-primary btn-block btn-lg" style="margin-top:8px;" onclick="checkoutNext()">Continue to payment ${icon('arrow-right',15)}</button>`;
+}
+
+function checkoutStepPayment(){
+  const d = State.checkoutData.payment;
+  return `
+  <h2 class="serif" style="font-size:22px;margin-bottom:24px;">Payment details</h2>
+  <div style="display:flex;gap:10px;margin-bottom:24px;">
+    <span class="badge badge-ivory">${icon('lock',11)} Secured by Stripe</span>
+  </div>
+  <div class="field"><label>Card number</label><input id="pay-card" value="${d.card||''}" placeholder="4242 4242 4242 4242" maxlength="19"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="field"><label>Expiry</label><input id="pay-exp" value="${d.exp||''}" placeholder="MM/YY"></div>
+    <div class="field"><label>CVC</label><input id="pay-cvc" value="${d.cvc||''}" placeholder="123" maxlength="4"></div>
+  </div>
+  <div class="field"><label>Name on card</label><input id="pay-name" value="${d.name||''}" placeholder="Jordan Lee"></div>
+  <label class="checkbox-row" style="margin-bottom:24px;"><input type="checkbox" id="pay-save" ${d.save?'checked':''}> Save this card for next time</label>
+  <div style="display:flex;gap:12px;">
+    <button class="btn btn-ghost" onclick="checkoutBack()">${icon('arrow-left',15)} Back</button>
+    <button class="btn btn-primary btn-block btn-lg" onclick="checkoutNext()">Review order ${icon('arrow-right',15)}</button>
+  </div>`;
+}
+
+function checkoutStepReview(){
+  const s = State.checkoutData.shipping;
+  const p = State.checkoutData.payment;
+  return `
+  <h2 class="serif" style="font-size:22px;margin-bottom:24px;">Review your order</h2>
+  <div style="margin-bottom:24px;">
+    <div class="eyebrow" style="margin-bottom:10px;">Shipping to</div>
+    <p style="font-size:14px;line-height:1.6;">${s.name||'—'}<br>${s.address||'—'}<br>${s.city||''}, ${s.state||''} ${s.zip||''}</p>
+  </div>
+  <div style="margin-bottom:24px;">
+    <div class="eyebrow" style="margin-bottom:10px;">Payment</div>
+    <p style="font-size:14px;">Card ending in ${p.card ? p.card.slice(-4) : '4242'}</p>
+  </div>
+  <label class="checkbox-row" style="margin-bottom:24px;"><input type="checkbox" id="agree-terms" checked> I agree to the Terms of Service and Return Policy</label>
+  <div style="display:flex;gap:12px;">
+    <button class="btn btn-ghost" onclick="checkoutBack()">${icon('arrow-left',15)} Back</button>
+    <button class="btn btn-primary btn-block btn-lg" onclick="placeOrder()">${icon('lock',15)} Place order</button>
+  </div>`;
+}
+
+function checkoutNext(){
+  if(State.checkoutStep===1){
+    const f = {name:$('#ship-name').value, email:$('#ship-email').value, address:$('#ship-address').value, city:$('#ship-city').value, state:$('#ship-state').value, zip:$('#ship-zip').value, method:$('#ship-method').value};
+    if(!f.name || !f.email || !f.address){ toast('error','Missing information','Please complete name, email, and address before continuing.'); return; }
+    State.checkoutData.shipping = f;
+  }
+  if(State.checkoutStep===2){
+    const f = {card:$('#pay-card').value, exp:$('#pay-exp').value, cvc:$('#pay-cvc').value, name:$('#pay-name').value, save:$('#pay-save').checked};
+    if(!f.card || !f.exp || !f.cvc){ toast('error','Missing payment info','Please complete all card fields to continue.'); return; }
+    State.checkoutData.payment = f;
+  }
+  State.checkoutStep++; renderApp();
+}
+function checkoutBack(){ State.checkoutStep--; renderApp(); }
+
+async function placeOrder(){
+  if(!State.user){ toast('error','Sign in required','Please sign in to place an order.'); navigate('login'); return; }
+  const items = State.cart.map(i=>({product_id:i.pid, material:i.material, qty:i.qty}));
+  const card = (State.checkoutData.payment && State.checkoutData.payment.card) || '';
+  const card_last4 = card.replace(/\s/g,'').slice(-4) || null;
+  const promo = State.checkoutData.promo;
+  try{
+    const order = await apiFetch('/orders', {method:'POST', body: JSON.stringify({
+      items, shipping: State.checkoutData.shipping, card_last4, promo_code: promo ? promo.code : null,
+    })});
+    State.lastOrder = {id:order.id, items:[...State.cart], total: order.total};
+    ORDERS.unshift(normalizeOrder(order));
+    State.cart = []; saveCart();
+    State.checkoutStep = 1;
+    State.checkoutData.promo = null;
+    toast('success','Order placed', `Confirmation ${order.id} sent to your email.`);
+    navigate('order-confirm');
+  }catch(e){ toast('error','Could not place order', e.message); }
+}
+
+function renderOrderConfirm(){
+  const o = State.lastOrder || {id:'VS-10500', items:[], total:0};
+  return `<section style="padding:80px 0;"><div class="container" style="max-width:560px;text-align:center;">
+    <div style="width:76px;height:76px;border-radius:50%;background:rgba(184,122,75,0.14);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;color:var(--copper-bright);">${icon('check-circle',34)}</div>
+    <h1 class="serif" style="font-size:32px;margin-bottom:12px;">Order confirmed</h1>
+    <p style="color:var(--text-dim);font-size:14.5px;margin-bottom:8px;">Thank you — your order is being prepared.</p>
+    <p class="mono" style="font-size:13px;color:var(--copper-bright);margin-bottom:36px;">Confirmation #${o.id}</p>
+    <div class="card" style="padding:24px;text-align:left;margin-bottom:32px;">
+      <div class="eyebrow" style="margin-bottom:14px;">What happens next</div>
+      <div style="display:flex;gap:12px;margin-bottom:16px;"><span style="color:var(--copper-bright);">${icon('mail',16)}</span><span style="font-size:13px;color:var(--text-dim);">A confirmation email is on its way</span></div>
+      <div style="display:flex;gap:12px;margin-bottom:16px;"><span style="color:var(--copper-bright);">${icon('package',16)}</span><span style="font-size:13px;color:var(--text-dim);">We'll notify you the moment it ships</span></div>
+      <div style="display:flex;gap:12px;"><span style="color:var(--copper-bright);">${icon('truck',16)}</span><span style="font-size:13px;color:var(--text-dim);">Estimated delivery in 5-7 business days</span></div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button class="btn btn-ghost" onclick="navigate('dashboard',{tab:'orders'})">Track order</button>
+      <button class="btn btn-primary" onclick="navigate('catalog',{cat:'all'})">Continue shopping</button>
+    </div>
+  </div></section>`;
+}
+
+/* ===================== VIEW: AUTH ===================== */
+function authShell(content){
+  return `<div style="min-height:100vh;display:flex;">
+    <div style="flex:1;display:none;position:relative;overflow:hidden;background:linear-gradient(155deg,var(--surface),var(--ink-soft));" class="auth-visual">
+      <img src="${img('auth-visual',900,1200)}" style="width:100%;height:100%;object-fit:cover;opacity:.85;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(21,17,15,0.6), transparent 50%);"></div>
+      <a href="#" onclick="navigate('landing');return false;" class="serif" style="position:absolute;top:40px;left:40px;font-size:22px;color:#fff;">Vespera</a>
+      <div style="position:absolute;bottom:48px;left:48px;right:48px;">
+        <p class="serif" style="font-size:24px;color:#fff;line-height:1.4;font-style:italic;">"Six years in and my Aria II still looks — and sounds — brand new."</p>
+        <p class="mono" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:14px;letter-spacing:.05em;">— MARIAM K., VERIFIED OWNER</p>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px;">
+      <div style="width:100%;max-width:400px;">
+        <a href="#" onclick="navigate('landing');return false;" class="serif auth-mobile-logo" style="font-size:22px;display:block;margin-bottom:40px;">Vespera</a>
+        ${content}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderLogin(){
+  return authShell(`
+    <div class="eyebrow" style="margin-bottom:16px;">Welcome back</div>
+    <h1 class="serif" style="font-size:30px;margin-bottom:28px;">Sign in to your account</h1>
+    <form onsubmit="event.preventDefault();doLogin();">
+      <div class="field"><label>Email</label><input id="login-email" type="email" required placeholder="you@email.com"></div>
+      <div class="field">
+        <label>Password</label>
+        <input id="login-pass" type="password" required placeholder="••••••••">
+        <button type="button" onclick="navigate('forgot')" style="align-self:flex-end;font-size:12px;color:var(--copper-bright);margin-top:4px;">Forgot password?</button>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:8px;">Sign in</button>
+    </form>
+    <div style="display:flex;align-items:center;gap:12px;margin:24px 0;">
+      <div class="divider"></div><span class="mono" style="font-size:11px;color:var(--text-faint);">OR</span><div class="divider"></div>
+    </div>
+    <button class="btn btn-ghost btn-block" style="margin-bottom:10px;" onclick="doLogin('Google')">${icon('chrome',16)} Continue with Google</button>
+    <button class="btn btn-ghost btn-block" onclick="doLogin('GitHub')">${icon('github',16)} Continue with GitHub</button>
+    <p style="text-align:center;font-size:13px;color:var(--text-dim);margin-top:28px;">New here? <button onclick="navigate('register')" style="color:var(--copper-bright);font-weight:600;">Create an account</button></p>
+  `);
+}
+
+async function doLogin(provider){
+  if(provider){ toast('info','Not available in this demo', `${provider} sign-in isn't connected.`); return; }
+  const email = $('#login-email')?.value || '';
+  const password = $('#login-pass')?.value || '';
+  if(!email || !password){ toast('error','Missing details','Enter your email and password.'); return; }
+  try{
+    const data = await apiFetch('/auth/login', {method:'POST', body: JSON.stringify({email, password})});
+    setToken(data.access_token);
+    State.user = {id:data.user.id, name:data.user.name, email:data.user.email, role:data.user.role};
+    await Promise.all([loadMyOrders(), loadMyWishlist()]);
+    toast('success','Signed in', `Welcome back, ${State.user.name}.`);
+    navigate('dashboard');
+  }catch(e){ toast('error','Could not sign in', e.message); }
+}
+
+function renderRegister(){
+  return authShell(`
+    <div class="eyebrow" style="margin-bottom:16px;">Join Vespera</div>
+    <h1 class="serif" style="font-size:30px;margin-bottom:28px;">Create your account</h1>
+    <form onsubmit="event.preventDefault();doRegister();">
+      <div class="field"><label>Full name</label><input id="reg-name" required placeholder="Jordan Lee"></div>
+      <div class="field"><label>Email</label><input id="reg-email" type="email" required placeholder="you@email.com"></div>
+      <div class="field"><label>Password</label><input id="reg-pass" type="password" required placeholder="At least 8 characters"><div class="field-hint">Use 8+ characters with a number and symbol.</div></div>
+      <label class="checkbox-row" style="margin-bottom:24px;"><input type="checkbox" required> I agree to the Terms of Service and Privacy Policy</label>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">Create account</button>
+    </form>
+    <p style="text-align:center;font-size:13px;color:var(--text-dim);margin-top:28px;">Already have an account? <button onclick="navigate('login')" style="color:var(--copper-bright);font-weight:600;">Sign in</button></p>
+  `);
+}
+async function doRegister(){
+  const name = $('#reg-name').value || '';
+  const email = $('#reg-email').value || '';
+  const password = $('#reg-pass').value || '';
+  if(!name || !email || !password){ toast('error','Missing details','Fill in all fields.'); return; }
+  try{
+    const data = await apiFetch('/auth/register', {method:'POST', body: JSON.stringify({name, email, password})});
+    setToken(data.access_token);
+    State.user = {id:data.user.id, name:data.user.name, email:data.user.email, role:data.user.role};
+    State.wishlist = [];
+    ORDERS.length = 0;
+    toast('success','Account created', `Welcome to Vespera, ${name.split(' ')[0]}.`);
+    navigate('dashboard');
+  }catch(e){ toast('error','Could not create account', e.message); }
+}
+
+function renderForgot(){
+  return authShell(`
+    <div class="eyebrow" style="margin-bottom:16px;">Reset password</div>
+    <h1 class="serif" style="font-size:28px;margin-bottom:14px;">Forgot your password?</h1>
+    <p style="font-size:13.5px;color:var(--text-dim);margin-bottom:28px;line-height:1.6;">Enter the email on your account and we'll send a link to reset it.</p>
+    <form onsubmit="event.preventDefault();toast('success','Reset link sent','Check your inbox for next steps.');navigate('login');">
+      <div class="field"><label>Email</label><input type="email" required placeholder="you@email.com"></div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">Send reset link</button>
+    </form>
+    <button onclick="navigate('login')" style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-dim);margin-top:24px;">${icon('arrow-left',14)} Back to sign in</button>
+  `);
+}
+
+/* ===================== VIEW: WISHLIST ===================== */
+function renderWishlistPage(){
+  const items = PRODUCTS.filter(p=>State.wishlist.includes(p.id));
+  return `<section style="padding:48px 0 100px;"><div class="container">
+    <h1 class="serif" style="font-size:clamp(28px,3.6vw,42px);margin-bottom:12px;">Wishlist</h1>
+    <p style="color:var(--text-dim);font-size:14px;margin-bottom:36px;">${items.length} saved item${items.length!==1?'s':''}</p>
+    ${items.length===0 ? `
+      <div style="text-align:center;padding:80px 20px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:rgba(184,122,75,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--copper-bright);">${icon('heart',26)}</div>
+        <p class="serif" style="font-size:19px;margin-bottom:8px;">Nothing saved yet</p>
+        <p style="font-size:13px;color:var(--text-dim);margin-bottom:20px;">Tap the heart on any product to save it here.</p>
+        <button class="btn btn-primary btn-sm" onclick="navigate('catalog',{cat:'all'})">Browse the catalog</button>
+      </div>` : `
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;" class="product-grid">${items.map(productCard).join('')}</div>`}
+  </div></section>`;
+}
+
+/* ===================== VIEW: USER DASHBOARD ===================== */
+let dashTab = 'overview';
+function renderDashboard(){
+  if(!State.user){ return renderLoggedOutDashboard(); }
+  if(State.params.tab) dashTab = State.params.tab;
+  const tabs = [['overview','Overview','layout-dashboard'],['orders','Orders','package'],['wishlist','Wishlist','heart'],['addresses','Addresses','map-pin'],['profile','Profile','user']];
+  return `<section style="padding:40px 0 100px;"><div class="container">
+    <div style="display:grid;grid-template-columns:240px 1fr;gap:40px;" class="dash-grid">
+      <aside>
+        <div class="card" style="padding:20px;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--copper-bright),var(--burgundy));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">${State.user.name[0].toUpperCase()}</div>
+            <div style="min-width:0;"><div style="font-weight:700;font-size:14px;">${State.user.name}</div><div style="font-size:11.5px;color:var(--text-faint);overflow:hidden;text-overflow:ellipsis;">${State.user.email}</div></div>
+          </div>
+        </div>
+        <nav style="display:flex;flex-direction:column;gap:2px;">
+          ${tabs.map(([id,label,ic])=>`
+            <button onclick="dashSetTab('${id}')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-sm);font-size:13.5px;text-align:left;
+              background:${dashTab===id?'rgba(184,122,75,0.1)':'transparent'};color:${dashTab===id?'var(--copper-bright)':'var(--text-dim)'};font-weight:${dashTab===id?'600':'400'};">${icon(ic,16)}${label}</button>`).join('')}
+          <button onclick="doLogout()" style="display:flex;align-items:center;gap:12px;padding:12px 14px;font-size:13.5px;color:var(--text-faint);margin-top:14px;border-top:1px solid var(--line);padding-top:18px;">${icon('log-out',16)}Sign out</button>
+        </nav>
+      </aside>
+      <div>${dashboardTabContent()}</div>
+    </div>
+  </div></section>`;
+}
+function dashSetTab(t){ dashTab=t; renderApp(); }
+function doLogout(){ State.user=null; setToken(null); ORDERS.length=0; loadWishlistLocal(); toast('info','Signed out','See you again soon.'); navigate('landing'); }
+
+function renderLoggedOutDashboard(){
+  return `<section style="padding:120px 0;"><div class="container" style="text-align:center;max-width:420px;">
+    <div style="width:64px;height:64px;border-radius:50%;background:rgba(184,122,75,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;color:var(--copper-bright);">${icon('user',26)}</div>
+    <h1 class="serif" style="font-size:26px;margin-bottom:12px;">Sign in to view your account</h1>
+    <p style="font-size:14px;color:var(--text-dim);margin-bottom:24px;">Track orders, manage your wishlist, and update your details.</p>
+    <button class="btn btn-primary" onclick="navigate('login')">Sign in</button>
+  </div></section>`;
+}
+
+function dashboardTabContent(){
+  if(dashTab==='overview'){
+    const recentOrder = ORDERS[0];
+    return `
+      <h1 class="serif" style="font-size:26px;margin-bottom:24px;">Welcome back, ${State.user.name.split(' ')[0]}</h1>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;" class="stat-grid">
+        ${statCard('Total orders', ORDERS.length, 'package', '+1 this month')}
+        ${statCard('Saved items', State.wishlist.length, 'heart', null)}
+        ${statCard('Lifetime spend', fmt(ORDERS.reduce((s,o)=>s+o.total,0)), 'wallet', null)}
+      </div>
+      <div class="card" style="padding:24px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:18px;"><h3 class="serif" style="font-size:17px;">Most recent order</h3><button onclick="dashSetTab('orders')" style="font-size:12px;color:var(--copper-bright);">View all →</button></div>
+        ${orderRow(recentOrder)}
+      </div>`;
+  }
+  if(dashTab==='orders'){
+    return `<h1 class="serif" style="font-size:26px;margin-bottom:24px;">Order history</h1>
+      <div class="card" style="overflow:hidden;">${ORDERS.map(orderRow).join('<div class="divider"></div>')}</div>`;
+  }
+  if(dashTab==='wishlist'){
+    const items = PRODUCTS.filter(p=>State.wishlist.includes(p.id));
+    return `<h1 class="serif" style="font-size:26px;margin-bottom:24px;">Wishlist</h1>
+      ${items.length===0 ? `<p style="color:var(--text-dim);font-size:13.5px;">No items saved yet.</p>` :
+      `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;" class="product-grid-3">${items.map(productCard).join('')}</div>`}`;
+  }
+  if(dashTab==='addresses'){
+    return `<h1 class="serif" style="font-size:26px;margin-bottom:24px;">Saved addresses</h1>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;" class="addr-grid">
+        <div class="card" style="padding:20px;">
+          <span class="badge badge-copper" style="margin-bottom:12px;">Default</span>
+          <p style="font-size:14px;line-height:1.6;">Mariam Khalil<br>248 Birch Hollow Lane<br>Austin, TX 78701<br>United States</p>
+          <div style="display:flex;gap:10px;margin-top:14px;"><button class="btn btn-ghost btn-sm">Edit</button><button class="btn btn-ghost btn-sm">Remove</button></div>
+        </div>
+        <button class="card" style="padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-dim);min-height:140px;" onclick="toast('info','New address','This is a prototype — address form not wired up.')">
+          ${icon('plus',20)}<span style="font-size:13px;margin-top:8px;">Add new address</span>
+        </button>
+      </div>`;
+  }
+  if(dashTab==='profile'){
+    return `<h1 class="serif" style="font-size:26px;margin-bottom:24px;">Profile settings</h1>
+      <div class="card" style="padding:28px;max-width:480px;">
+        <div class="field"><label>Full name</label><input value="${State.user.name}" id="prof-name"></div>
+        <div class="field"><label>Email</label><input value="${State.user.email}" id="prof-email"></div>
+        <div class="field"><label>Phone</label><input placeholder="+1 (555) 000-0000"></div>
+        <label class="checkbox-row" style="margin-bottom:24px;"><input type="checkbox" checked> Email me about order updates and new arrivals</label>
+        <button class="btn btn-primary" onclick="toast('success','Profile updated','Your changes have been saved.')">Save changes</button>
+      </div>`;
+  }
+}
+
+function statCard(label, value, ic, sub){
+  return `<div class="card" style="padding:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(184,122,75,0.12);color:var(--copper-bright);display:flex;align-items:center;justify-content:center;">${icon(ic,17)}</div>
+    </div>
+    <div class="serif" style="font-size:26px;margin-bottom:4px;">${value}</div>
+    <div style="font-size:12px;color:var(--text-dim);">${label}</div>
+    ${sub?`<div class="mono" style="font-size:10.5px;color:var(--copper-bright);margin-top:6px;">${sub}</div>`:''}
+  </div>`;
+}
+
+const STATUS_STYLE = {
+  delivered:{bg:'rgba(120,160,110,0.14)',c:'#9FC79A',label:'Delivered'},
+  shipped:{bg:'rgba(184,122,75,0.16)',c:'var(--copper-bright)',label:'Shipped'},
+  processing:{bg:'rgba(246,239,228,0.08)',c:'var(--text-dim)',label:'Processing'},
+};
+
+function orderRow(o){
+  const s = STATUS_STYLE[o.status];
+  const firstProduct = getProduct(o.items[0].pid);
+  return `<div style="display:flex;align-items:center;gap:16px;padding:18px 24px;cursor:pointer;" onclick="openOrderTracking('${o.id}')">
+    <img src="${firstProduct.images[0]}" style="width:54px;height:54px;border-radius:10px;object-fit:cover;flex:none;">
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;gap:10px;align-items:center;"><span class="mono" style="font-size:13px;font-weight:600;">${o.id}</span><span class="badge" style="background:${s.bg};color:${s.c};">${s.label}</span></div>
+      <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">${o.items.length} item${o.items.length>1?'s':''} · Placed ${o.date}</div>
+    </div>
+    <span class="mono" style="font-size:14px;font-weight:600;flex:none;">${fmt(o.total)}</span>
+    <span style="color:var(--text-faint);flex:none;">${icon('chevron-right',16)}</span>
+  </div>`;
+}
+
+function openOrderTracking(orderId){
+  const o = ORDERS.find(x=>x.id===orderId);
+  const steps = ['Order placed','Processing','Shipped','Out for delivery','Delivered'];
+  const statusIdx = {processing:1, shipped:2, delivered:4}[o.status] ?? 1;
+  const root = $('#overlay-root');
+  const html = `<div id="track-overlay" class="overlay" onclick="if(event.target===this)closeTracking()">
+    <div class="modal-center glass" style="width:min(520px,92vw);padding:32px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:24px;">
+        <div><div class="mono" style="font-size:13px;color:var(--copper-bright);">${o.id}</div><div style="font-size:13px;color:var(--text-dim);">Placed ${o.date}</div></div>
+        <button class="btn-icon" onclick="closeTracking()" aria-label="Close">${icon('x',16)}</button>
+      </div>
+      <div style="margin-bottom:28px;">
+        ${steps.map((s,i)=>`
+          <div style="display:flex;gap:14px;">
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <div style="width:22px;height:22px;border-radius:50%;background:${i<=statusIdx?'var(--copper-bright)':'var(--surface-soft)'};display:flex;align-items:center;justify-content:center;flex:none;">${i<=statusIdx?icon('check',12):''}</div>
+              ${i<steps.length-1?`<div style="width:1.5px;flex:1;background:${i<statusIdx?'var(--copper-bright)':'var(--line-strong)'};min-height:28px;"></div>`:''}
+            </div>
+            <div style="padding-bottom:24px;"><div style="font-size:13.5px;font-weight:${i<=statusIdx?'600':'400'};color:${i<=statusIdx?'var(--ivory)':'var(--text-faint)'};">${s}</div></div>
+          </div>`).join('')}
+      </div>
+      <div class="card" style="padding:16px;">
+        ${o.items.map(it=>{ const p=getProduct(it.pid); return `<div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;"><img src="${p.images[0]}" style="width:34px;height:34px;border-radius:6px;object-fit:cover;"><span style="font-size:12.5px;flex:1;">${p.name}</span><span class="mono" style="font-size:11px;color:var(--text-faint);">×${it.qty}</span></div>`}).join('')}
+      </div>
+    </div>
+  </div>`;
+  const existing = document.getElementById('track-overlay'); if(existing) existing.remove();
+  root.insertAdjacentHTML('beforeend', html);
+  refreshIcons();
+  requestAnimationFrame(()=>$('#track-overlay').classList.add('open'));
+}
+function closeTracking(){
+  const el = $('#track-overlay');
+  if(el){ el.classList.remove('open'); setTimeout(()=>el.remove(),400); }
+}
+/* ===================== VIEW: ADMIN DASHBOARD ===================== */
+const ADMIN_NAV = [
+  ['overview','Overview','layout-dashboard'],
+  ['products','Products','package'],
+  ['inventory','Inventory','boxes'],
+  ['orders','Orders','clipboard-list'],
+  ['users','Users','users'],
+  ['promos','Promo codes','ticket'],
+];
+
+function renderAdmin(){
+  if(State.params.adminView) State.adminView = State.params.adminView;
+  if(!State.adminDataLoaded){ State.adminDataLoaded = true; loadAdminData(); }
+  return `<div style="display:flex;min-height:100vh;" class="admin-shell">
+    <aside style="width:240px;flex:none;background:var(--surface);border-right:1px solid var(--line);padding:24px 16px;display:flex;flex-direction:column;" class="admin-sidebar">
+      <a href="#" onclick="navigate('landing');return false;" class="serif" style="font-size:19px;padding:0 10px;margin-bottom:32px;display:flex;align-items:center;gap:10px;">
+        <span style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--copper-bright),var(--burgundy));display:inline-flex;align-items:center;justify-content:center;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L20 7V17L12 22L4 17V7L12 2Z" stroke="#15110F" stroke-width="1.8"/></svg>
+        </span>Vespera <span class="mono" style="font-size:10px;color:var(--text-faint);">ADMIN</span>
+      </a>
+      <nav style="display:flex;flex-direction:column;gap:2px;flex:1;">
+        ${ADMIN_NAV.map(([id,label,ic])=>`
+          <button onclick="adminSetView('${id}')" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:var(--radius-sm);font-size:13.5px;text-align:left;
+            background:${State.adminView===id?'rgba(184,122,75,0.12)':'transparent'};color:${State.adminView===id?'var(--copper-bright)':'var(--text-dim)'};font-weight:${State.adminView===id?'600':'400'};">${icon(ic,16)}${label}</button>`).join('')}
+      </nav>
+      <div class="divider" style="margin:16px 0;"></div>
+      <button onclick="navigate('landing')" style="display:flex;align-items:center;gap:12px;padding:11px 12px;font-size:13px;color:var(--text-faint);">${icon('arrow-left',16)}Back to store</button>
+    </aside>
+    <main style="flex:1;min-width:0;overflow-x:hidden;">
+      <div style="position:sticky;top:0;z-index:50;background:var(--ink);border-bottom:1px solid var(--line);padding:18px 32px;display:flex;justify-content:space-between;align-items:center;">
+        <h1 class="serif" style="font-size:20px;text-transform:capitalize;">${ADMIN_NAV.find(n=>n[0]===State.adminView)?.[1]}</h1>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <button class="btn-icon" aria-label="Toggle theme" onclick="toggleTheme()">${icon(State.theme==='dark'?'sun':'moon',16)}</button>
+          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--copper-bright),var(--burgundy));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">D</div>
+        </div>
+      </div>
+      <div style="padding:32px;">${adminViewContent()}</div>
+    </main>
+  </div>`;
+}
+function adminSetView(v){ State.adminView=v; renderApp(); }
+
+function adminViewContent(){
+  switch(State.adminView){
+    case 'overview': return adminOverview();
+    case 'products': return adminProducts();
+    case 'inventory': return adminInventory();
+    case 'orders': return adminOrders();
+    case 'users': return adminUsers();
+    case 'promos': return adminPromos();
+    default: return adminOverview();
+  }
+}
+
+function adminOverview(){
+  const sourceOrders = ADMIN_ORDERS.length ? ADMIN_ORDERS : ORDERS;
+  const revenue = sourceOrders.reduce((s,o)=>s+o.total,0) * 38;
+  const chartData = [42,55,49,68,61,74,82,77,91,86,98,112];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const maxV = Math.max(...chartData);
+  const catSales = [['Audio',42],['Carry',27],['Desk',19],['Wearables',12]];
+  return `
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;" class="admin-stat-grid">
+      ${adminStat('Revenue (30d)', fmt(revenue), '+18.2%', 'up', 'wallet')}
+      ${adminStat('Orders', sourceOrders.length*47, '+9.4%', 'up', 'clipboard-list')}
+      ${adminStat('Active users', ADMIN_USERS.filter(u=>u.status==='active').length*210, '+4.1%', 'up', 'users')}
+      ${adminStat('Avg. order value', fmt(218), '−2.3%', 'down', 'receipt')}
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:28px;" class="admin-chart-row">
+      <div class="card" style="padding:24px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:20px;"><h3 class="serif" style="font-size:16px;">Revenue trend</h3><span class="badge badge-copper">2026</span></div>
+        <div style="display:flex;align-items:flex-end;gap:8px;height:180px;">
+          ${chartData.map((v,i)=>`
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end;">
+              <div style="width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--copper-bright),var(--copper-dim));height:${(v/maxV*100)}%;transition:height .8s var(--ease);" title="${months[i]}: ${fmt(v*1000)}"></div>
+              <span class="mono" style="font-size:9.5px;color:var(--text-faint);">${months[i]}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="card" style="padding:24px;">
+        <h3 class="serif" style="font-size:16px;margin-bottom:20px;">Sales by category</h3>
+        ${catSales.map(([name,pct])=>`
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px;"><span>${name}</span><span class="mono" style="color:var(--text-dim);">${pct}%</span></div>
+            <div style="height:6px;background:var(--surface-soft);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:var(--copper-bright);border-radius:4px;"></div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:20px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;"><h3 class="serif" style="font-size:16px;">Recent orders</h3><button onclick="adminSetView('orders')" style="font-size:12px;color:var(--copper-bright);">View all →</button></div>
+      ${adminOrdersTable(sourceOrders.slice(0,4))}
+    </div>`;
+}
+
+function adminStat(label, value, delta, dir, ic){
+  return `<div class="card" style="padding:20px;">
+    <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(184,122,75,0.12);color:var(--copper-bright);display:flex;align-items:center;justify-content:center;">${icon(ic,17)}</div>
+      <span class="mono" style="font-size:11px;color:${dir==='up'?'#9FC79A':'#E8919E'};display:flex;align-items:center;gap:3px;">${icon(dir==='up'?'trending-up':'trending-down',12)}${delta}</span>
+    </div>
+    <div class="serif" style="font-size:24px;margin-bottom:4px;">${value}</div>
+    <div style="font-size:12px;color:var(--text-dim);">${label}</div>
+  </div>`;
+}
+
+function adminProducts(){
+  return `
+    <div style="display:flex;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <div style="display:flex;gap:10px;">
+        <input placeholder="Search products…" style="background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--ivory);width:240px;">
+        <select style="background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--ivory);">
+          <option>All categories</option>${CATEGORIES.map(c=>`<option>${c.name}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="adminAddProduct()">${icon('plus',14)} Add product</button>
+    </div>
+    <div class="card" style="overflow:hidden;">
+      <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;min-width:760px;">
+        <thead><tr style="border-bottom:1px solid var(--line);">
+          ${['Product','Category','Price','Stock','Rating','Status',''].map(h=>`<th style="text-align:left;padding:14px 20px;font-size:11px;letter-spacing:.05em;color:var(--text-faint);font-family:var(--font-mono);">${h.toUpperCase()}</th>`).join('')}
+        </tr></thead>
+        <tbody>
+          ${PRODUCTS.map(p=>`
+            <tr style="border-bottom:1px solid var(--line);" onmouseover="this.style.background='rgba(184,122,75,0.04)'" onmouseout="this.style.background='none'">
+              <td style="padding:12px 20px;"><div style="display:flex;align-items:center;gap:12px;"><img src="${p.images[0]}" style="width:38px;height:38px;border-radius:8px;object-fit:cover;"><span style="font-size:13px;font-weight:600;">${p.name}</span></div></td>
+              <td style="padding:12px 20px;font-size:13px;color:var(--text-dim);">${CATEGORIES.find(c=>c.id===p.cat).name}</td>
+              <td style="padding:12px 20px;font-size:13px;" class="mono">${fmt(p.price)}</td>
+              <td style="padding:12px 20px;font-size:13px;" class="mono">${p.stock}</td>
+              <td style="padding:12px 20px;font-size:13px;">${starRow(p.rating,11)}</td>
+              <td style="padding:12px 20px;"><span class="badge ${p.stock===0?'badge-burgundy':'badge-success'}">${p.stock===0?'Out of stock':'Active'}</span></td>
+              <td style="padding:12px 20px;"><div style="display:flex;gap:6px;">
+                <button class="btn-icon" style="width:30px;height:30px;" onclick="adminEditProduct('${p.id}')" aria-label="Edit product">${icon('pencil',15)}</button>
+                <button class="btn-icon" style="width:30px;height:30px;" onclick="adminDeleteProduct('${p.id}')" aria-label="Delete product">${icon('trash-2',15)}</button>
+              </div></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+      </div>
+    </div>`;
+}
+async function adminAddProduct(){
+  const name = window.prompt('Product name?');
+  if(!name) return;
+  const category_id = window.prompt('Category id? (' + CATEGORIES.map(c=>c.id).join(', ') + ')', CATEGORIES[0]?.id || '');
+  if(!category_id) return;
+  const price = parseFloat(window.prompt('Price?', '99'));
+  if(!price || price<=0){ toast('error','Invalid price','Enter a valid number.'); return; }
+  const stock = parseInt(window.prompt('Stock?', '10'),10) || 0;
+  try{
+    await apiFetch('/products', {method:'POST', body: JSON.stringify({name, category_id, price, stock})});
+    toast('success','Product added', name);
+    await loadProductsFromAPI(); renderApp();
+  }catch(e){ toast('error','Could not add product', e.message); }
+}
+async function adminEditProduct(pid){
+  const p = getProduct(pid);
+  if(!p) return;
+  const name = window.prompt('Product name?', p.name);
+  if(name===null) return;
+  const priceStr = window.prompt('Price?', p.price);
+  if(priceStr===null) return;
+  const stockStr = window.prompt('Stock?', p.stock);
+  if(stockStr===null) return;
+  try{
+    await apiFetch('/products/'+pid, {method:'PUT', body: JSON.stringify({name, price: parseFloat(priceStr), stock: parseInt(stockStr,10)})});
+    toast('success','Product updated', name);
+    await loadProductsFromAPI(); renderApp();
+  }catch(e){ toast('error','Could not update product', e.message); }
+}
+async function adminDeleteProduct(pid){
+  const p = getProduct(pid);
+  if(!p) return;
+  if(!window.confirm(`Delete "${p.name}"? This cannot be undone.`)) return;
+  try{
+    await apiFetch('/products/'+pid, {method:'DELETE'});
+    toast('success','Product deleted', p.name);
+    await loadProductsFromAPI(); renderApp();
+  }catch(e){ toast('error','Could not delete product', e.message); }
+}
+
+function adminInventory(){
+  const low = PRODUCTS.filter(p=>p.stock>0 && p.stock<15);
+  const out = PRODUCTS.filter(p=>p.stock===0);
+  return `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
+      ${adminStat('Total SKUs', PRODUCTS.length, '', 'up', 'boxes')}
+      ${adminStat('Low stock', low.length, '', 'down', 'alert-triangle')}
+      ${adminStat('Out of stock', out.length, '', 'down', 'x-circle')}
+    </div>
+    ${out.length ? `<div class="card" style="padding:20px;margin-bottom:20px;border-color:rgba(122,35,48,0.3);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;color:#E8919E;">${icon('alert-triangle',16)}<span style="font-weight:600;font-size:13.5px;">Out of stock — restock recommended</span></div>
+      ${out.map(p=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);"><span style="font-size:13px;">${p.name}</span><button class="btn btn-ghost btn-sm" onclick="toast('success','Restock requested',\`A purchase order draft was created for ${p.name}.\`)">Request restock</button></div>`).join('')}
+    </div>`:''}
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:18px 24px;border-bottom:1px solid var(--line);"><h3 class="serif" style="font-size:16px;">Stock levels</h3></div>
+      ${PRODUCTS.map(p=>`
+        <div style="display:flex;align-items:center;gap:16px;padding:14px 24px;border-bottom:1px solid var(--line);">
+          <img src="${p.images[0]}" style="width:38px;height:38px;border-radius:8px;object-fit:cover;flex:none;">
+          <span style="font-size:13px;flex:1;">${p.name}</span>
+          <div style="width:140px;height:6px;background:var(--surface-soft);border-radius:4px;overflow:hidden;flex:none;"><div style="height:100%;width:${clamp(p.stock/60*100,2,100)}%;background:${p.stock===0?'#7A2330':p.stock<15?'var(--copper-bright)':'#9FC79A'};"></div></div>
+          <span class="mono" style="font-size:12.5px;width:30px;text-align:right;flex:none;">${p.stock}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+function adminOrdersTable(orders){
+  return `<div style="overflow-x:auto;">
+  <table style="width:100%;border-collapse:collapse;min-width:680px;">
+    <thead><tr style="border-bottom:1px solid var(--line);">
+      ${['Order','Customer','Date','Status','Total',''].map(h=>`<th style="text-align:left;padding:14px 24px;font-size:11px;letter-spacing:.05em;color:var(--text-faint);font-family:var(--font-mono);">${h.toUpperCase()}</th>`).join('')}
+    </tr></thead>
+    <tbody>
+      ${orders.map((o,i)=>{ const s=STATUS_STYLE[o.status]; const custName = o.customer || (ADMIN_USERS[i%ADMIN_USERS.length]||{}).name || '—';
+        return `<tr style="border-bottom:1px solid var(--line);" onmouseover="this.style.background='rgba(184,122,75,0.04)'" onmouseout="this.style.background='none'">
+        <td style="padding:13px 24px;" class="mono" style="font-size:13px;">${o.id}</td>
+        <td style="padding:13px 24px;font-size:13px;">${custName}</td>
+        <td style="padding:13px 24px;font-size:13px;color:var(--text-dim);" class="mono">${o.date}</td>
+        <td style="padding:13px 24px;"><span class="badge" style="background:${s.bg};color:${s.c};">${s.label}</span></td>
+        <td style="padding:13px 24px;font-size:13px;" class="mono">${fmt(o.total)}</td>
+        <td style="padding:13px 24px;"><button class="btn-icon" style="width:28px;height:28px;" onclick="openOrderTracking('${o.id}')">${icon('eye',14)}</button></td>
+      </tr>`;}).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+function adminOrders(){
+  const allOrders = ADMIN_ORDERS.length ? ADMIN_ORDERS : [...ORDERS, ...ORDERS.map(o=>({...o,id:o.id+'-A'})), ...ORDERS.map(o=>({...o,id:o.id+'-B'}))];
+  return `
+    <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+      ${['All','Processing','Shipped','Delivered'].map((s,i)=>`<button class="badge ${i===0?'badge-copper':'badge-ivory'}" style="cursor:pointer;padding:8px 16px;">${s}</button>`).join('')}
+    </div>
+    <div class="card" style="overflow:hidden;">${adminOrdersTable(allOrders)}</div>`;
+}
+
+function adminUsers(){
+  return `
+    <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+      <input placeholder="Search users…" style="background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--ivory);width:240px;">
+      <button class="btn btn-primary btn-sm" onclick="toast('info','Invite user','Prototype — invite flow not wired up.')">${icon('user-plus',14)} Invite user</button>
+    </div>
+    <div class="card" style="overflow:hidden;">
+      <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;min-width:760px;">
+        <thead><tr style="border-bottom:1px solid var(--line);">
+          ${['User','Role','Orders','Spent','Joined','Status',''].map(h=>`<th style="text-align:left;padding:14px 20px;font-size:11px;letter-spacing:.05em;color:var(--text-faint);font-family:var(--font-mono);">${h.toUpperCase()}</th>`).join('')}
+        </tr></thead>
+        <tbody>
+          ${ADMIN_USERS.map(u=>`
+            <tr style="border-bottom:1px solid var(--line);" onmouseover="this.style.background='rgba(184,122,75,0.04)'" onmouseout="this.style.background='none'">
+              <td style="padding:12px 20px;"><div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--copper-bright),var(--burgundy));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex:none;">${u.name[0]}</div><div><div style="font-size:13px;font-weight:600;">${u.name}</div><div style="font-size:11px;color:var(--text-faint);">${u.email}</div></div></div></td>
+              <td style="padding:12px 20px;"><span class="badge badge-ivory">${u.role}</span></td>
+              <td style="padding:12px 20px;font-size:13px;" class="mono">${u.orders}</td>
+              <td style="padding:12px 20px;font-size:13px;" class="mono">${fmt(u.spent)}</td>
+              <td style="padding:12px 20px;font-size:13px;color:var(--text-dim);" class="mono">${u.joined}</td>
+              <td style="padding:12px 20px;"><span class="badge ${u.status==='active'?'badge-success':'badge-burgundy'}">${u.status}</span></td>
+              <td style="padding:12px 20px;"><button class="btn-icon" style="width:30px;height:30px;" onclick="adminManageUser('${u.id}', '${u.status}')" aria-label="Manage user">${icon(u.status==='active'?'user-x':'user-check',15)}</button></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+      </div>
+    </div>`;
+}
+async function adminManageUser(id, currentStatus){
+  if(State.user && String(State.user.id)===String(id)){ toast('error','Not allowed','You cannot block your own account.'); return; }
+  const nextStatus = currentStatus==='active' ? 'blocked' : 'active';
+  if(!window.confirm(`${nextStatus==='blocked'?'Block':'Reactivate'} this user?`)) return;
+  try{
+    await apiFetch('/admin/users/'+id, {method:'PATCH', body: JSON.stringify({status: nextStatus})});
+    toast('success','User updated', `Status set to ${nextStatus}.`);
+    await loadAdminUsers(); renderApp();
+  }catch(e){ toast('error','Could not update user', e.message); }
+}
+
+function adminPromos(){
+  return `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
+      <button class="btn btn-primary btn-sm" onclick="adminAddPromo()">${icon('plus',14)} New promo code</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;" class="promo-grid">
+      ${PROMO_CODES.map(p=>`
+        <div class="card" style="padding:20px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
+            <span class="mono" style="font-size:16px;font-weight:700;letter-spacing:.03em;">${p.code}</span>
+            <span class="badge ${p.active?'badge-success':'badge-ivory'}">${p.active?'Active':'Expired'}</span>
+          </div>
+          <div style="font-size:13px;color:var(--text-dim);margin-bottom:14px;">
+            ${p.type==='percent'?`${p.value}% off order`:p.type==='fixed'?`${fmt(p.value)} off order`:'Free shipping'}
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-faint);margin-bottom:8px;">
+            <span>Used ${p.uses}${p.limit?` / ${p.limit}`:''}</span><span>${p.expires?`Expires ${p.expires}`:'No expiry'}</span>
+          </div>
+          ${p.limit?`<div style="height:5px;background:var(--surface-soft);border-radius:4px;overflow:hidden;margin-bottom:14px;"><div style="height:100%;width:${clamp(p.uses/p.limit*100,2,100)}%;background:var(--copper-bright);"></div></div>`:''}
+          <button class="btn btn-ghost btn-sm btn-block" onclick="adminTogglePromo(${p.id}, ${p.active})">${p.active?'Deactivate':'Activate'}</button>
+        </div>`).join('')}
+    </div>`;
+}
+async function adminAddPromo(){
+  const code = window.prompt('Promo code?');
+  if(!code) return;
+  const type = window.prompt('Type? (percent / fixed / shipping)', 'percent');
+  if(!type) return;
+  const value = parseFloat(window.prompt('Value? (% or $ amount, 100 for free shipping)', '10')) || 0;
+  try{
+    await apiFetch('/promos', {method:'POST', body: JSON.stringify({code, type, value, active:true})});
+    toast('success','Promo created', code.toUpperCase());
+    await loadAdminPromos(); renderApp();
+  }catch(e){ toast('error','Could not create promo', e.message); }
+}
+async function adminTogglePromo(id, active){
+  try{
+    await apiFetch('/promos/'+id, {method:'PUT', body: JSON.stringify({active: !active})});
+    await loadAdminPromos(); renderApp();
+  }catch(e){ toast('error','Could not update promo', e.message); }
+}
+
+/* ===================== INIT / BOOT ===================== */
+function afterRenderHook(){
+  // re-attach any per-view listeners if needed in future; currently no-op
+}
+
+(function boot(){
+  document.documentElement.setAttribute('data-theme', State.theme);
+  loadCart();
+  loadWishlistLocal();
+
+  async function bootstrapAndRender(){
+    await Promise.all([loadCategoriesFromAPI(), loadProductsFromAPI(), restoreSession()]);
+    renderApp();
+    document.getElementById('app').style.opacity = '1';
+    const loader = document.getElementById('loader');
+    if(loader){ loader.style.opacity = '0'; loader.style.visibility = 'hidden'; setTimeout(()=>loader.remove(), 650); }
+  }
+
+  let bootstrapped = false;
+  function startBootstrap(){
+    if(bootstrapped) return;
+    bootstrapped = true;
+    setTimeout(bootstrapAndRender, 600);
+  }
+
+  window.addEventListener('load', startBootstrap);
+  if(document.readyState === 'complete'){ startBootstrap(); }
+})();
+</script>
+</body>
+</html>
