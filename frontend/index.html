@@ -5,50 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VESPERA — Considered Objects</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ===================== DESIGN TOKENS ===================== */
 :root{
-  --ink:#15110F;
-  --ink-soft:#221C19;
-  --surface:#2A2220;
-  --surface-soft:#352B27;
-  --ivory:#F6EFE4;
-  --ivory-dim:#EDE3D3;
-  --beige:#E8DCC8;
-  --burgundy:#5C1A23;
-  --burgundy-bright:#7A2330;
-  --copper:#B87A4B;
-  --copper-bright:#D49A6A;
-  --copper-dim:#8C6240;
-  --line:rgba(246,239,228,0.10);
-  --line-strong:rgba(246,239,228,0.18);
-  --text-dim:rgba(246,239,228,0.58);
-  --text-faint:rgba(246,239,228,0.36);
+  /* Dark palette — used when data-theme="dark" or no theme set */
+  --ink:#141716;
+  --ink-soft:#1E2220;
+  --surface:#1C2120;
+  --surface-soft:#242C2A;
+  --ivory:#E8E6E1;
+  --ivory-dim:#CCCAC5;
+  --beige:#9A9890;
+  --burgundy:#2A3C2C;
+  --burgundy-bright:#3C5240;
+  --copper:#617063;
+  --copper-bright:#7A9C7C;
+  --copper-dim:#4A5C4C;
+  --line:rgba(232,230,225,0.09);
+  --line-strong:rgba(232,230,225,0.16);
+  --text-dim:rgba(232,230,225,0.58);
+  --text-faint:rgba(232,230,225,0.36);
 
-  --font-display:'Fraunces', serif;
-  --font-body:'Inter', sans-serif;
-  --font-mono:'JetBrains Mono', monospace;
+  --font-display:'Cormorant', Georgia, serif;
+  --font-body:'Outfit', 'Helvetica Neue', sans-serif;
+  --font-mono:'Outfit', monospace;
 
-  --radius-sm:6px;
-  --radius-md:12px;
-  --radius-lg:20px;
+  --radius-sm:2px;
+  --radius-md:4px;
+  --radius-lg:6px;
   --ease:cubic-bezier(.16,1,.3,1);
 }
 
 /* Light mode overrides */
 [data-theme="light"]{
-  --ink:#F6EFE4;
-  --ink-soft:#EDE3D3;
-  --surface:#FFFCF6;
-  --surface-soft:#FBF5EA;
-  --ivory:#15110F;
-  --ivory-dim:#221C19;
-  --beige:#3A2F2A;
-  --line:rgba(21,17,15,0.10);
-  --line-strong:rgba(21,17,15,0.18);
-  --text-dim:rgba(21,17,15,0.62);
-  --text-faint:rgba(21,17,15,0.40);
+  --ink:#FAFAF8;
+  --ink-soft:#F0EDEA;
+  --surface:#F0EDEA;
+  --surface-soft:#E8E3DC;
+  --ivory:#1A1F1E;
+  --ivory-dim:#303835;
+  --beige:#5A5754;
+  --line:rgba(26,31,30,0.08);
+  --line-strong:rgba(26,31,30,0.15);
+  --text-dim:rgba(26,31,30,0.58);
+  --text-faint:rgba(26,31,30,0.36);
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -98,32 +99,32 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   border:1px solid var(--line);
 }
 [data-theme="light"] .glass{
-  background:linear-gradient(155deg, rgba(255,255,255,0.6), rgba(255,255,255,0.25));
+  background:rgba(250,250,248,0.88);
 }
 
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:14px 28px;border-radius:999px;font-size:13px;font-weight:600;
-  letter-spacing:.04em;text-transform:uppercase;
-  transition:transform .35s var(--ease), box-shadow .35s var(--ease), background .35s var(--ease), color .35s var(--ease), border-color .35s var(--ease);
+  padding:14px 28px;border-radius:0;font-size:12px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  transition:transform .3s var(--ease), box-shadow .3s var(--ease), background .3s var(--ease), color .3s var(--ease), opacity .3s var(--ease);
   white-space:nowrap;
 }
 .btn-primary{
-  background:linear-gradient(155deg, var(--copper-bright), var(--copper-dim));
+  background:var(--ivory);
   color:var(--ink);
-  box-shadow:0 8px 24px -8px rgba(184,122,75,0.5);
+  box-shadow:none;
 }
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px -8px rgba(184,122,75,0.65);}
-.btn-primary:active{transform:translateY(0px) scale(.98);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px -4px rgba(26,31,30,0.18);}
+.btn-primary:active{transform:translateY(0) scale(.98);}
 .btn-ghost{
   border:1px solid var(--line-strong);
   color:var(--ivory);
-  background:rgba(246,239,228,0.02);
+  background:transparent;
 }
-.btn-ghost:hover{border-color:var(--copper);background:rgba(184,122,75,0.08);}
+.btn-ghost:hover{border-color:var(--copper-bright);background:rgba(97,112,99,0.06);}
 .btn-dark{
-  background:var(--ink);
-  color:var(--ivory);
+  background:var(--ivory);
+  color:var(--ink);
   border:1px solid var(--line-strong);
 }
 .btn-sm{padding:10px 18px;font-size:11.5px;}
@@ -275,7 +276,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   transition:border-color .3s var(--ease), background .3s var(--ease);
 }
 [data-theme="light"] .field input, [data-theme="light"] .field select, [data-theme="light"] .field textarea{
-  background:rgba(21,17,15,0.03);
+  background:rgba(26,31,30,0.04);
 }
 .field input:focus, .field select:focus, .field textarea:focus{
   border-color:var(--copper);
@@ -291,7 +292,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 /* Cards */
 .card{
   background:var(--surface);
-  border:1px solid var(--line);
+  border:1px solid var(--line-strong);
   border-radius:var(--radius-lg);
   transition:border-color .35s var(--ease), transform .35s var(--ease), box-shadow .35s var(--ease);
 }
@@ -617,7 +618,7 @@ const State = {
   view:'landing',
   prevView:null,
   params:{},
-  theme: localStorage.getItem('vsp_theme') || 'dark',
+  theme: localStorage.getItem('vsp_theme') || 'light',
   user: null, // {name,email}
   cart: [], // {pid, material, qty}
   wishlist: [], // pid
@@ -776,11 +777,11 @@ function renderHeader(){
   const active = (v)=> State.view===v ? 'color:var(--ivory);' : 'color:var(--text-dim);';
   return `
   <header id="site-header" style="position:sticky;top:0;z-index:500;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    background:${State.theme==='dark'?'rgba(21,17,15,0.78)':'rgba(246,239,228,0.82)'};border-bottom:1px solid var(--line);transition:background .4s var(--ease);">
+    background:${State.theme==='dark'?'rgba(20,23,22,0.82)':'rgba(250,250,248,0.88)'};border-bottom:1px solid var(--line);transition:background .4s var(--ease);">
     <div class="container" style="display:flex;align-items:center;justify-content:space-between;height:78px;gap:24px;">
-      <a href="#" onclick="navigate('landing');return false;" class="serif" style="font-size:22px;font-weight:600;letter-spacing:.01em;display:flex;align-items:center;gap:10px;flex:none;">
-        <span style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--copper-bright),var(--burgundy));display:inline-flex;align-items:center;justify-content:center;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L20 7V17L12 22L4 17V7L12 2Z" stroke="#15110F" stroke-width="1.6"/></svg>
+      <a href="#" onclick="navigate('landing');return false;" class="serif" style="font-size:22px;font-weight:500;letter-spacing:.02em;display:flex;align-items:center;gap:10px;flex:none;">
+        <span style="width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line-strong);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2L20 7V17L12 22L4 17V7L12 2Z" stroke="var(--ivory)" stroke-width="1.5"/></svg>
         </span>
         Vespera
       </a>
