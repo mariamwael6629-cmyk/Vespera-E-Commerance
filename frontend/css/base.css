@@ -1,0 +1,11 @@
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+}
+
+/* Focus visibility */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible{
+  outline:2px solid var(--copper-bright);
+  outline-offset:3px;
+  border-radius:4px;
+}

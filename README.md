@@ -41,8 +41,20 @@ A sophisticated, full-stack e-commerce platform featuring a lightweight **Vanill
 │   ├── requirements.txt
 │   ├── .env                    # Local environment config
 │   └── .env.example
-└── frontend/           # Single-Page Application (SPA)
-    └── index.html       # Single-file frontend (HTML/CSS/JS, zero build steps)
+└── frontend/           # Single-Page Application (SPA), zero build steps
+    ├── index.html       # Markup shell — loads the CSS and JS below
+    ├── css/
+    │   ├── tokens.css       # Design tokens (colors, type, spacing) + light mode
+    │   ├── base.css         # Reduced motion + focus styles
+    │   ├── utilities.css    # Layout helpers, glass, badges
+    │   ├── animations.css   # Page transitions + loader
+    │   ├── components.css   # Toasts, modals, forms, cards, reveal
+    │   └── responsive.css   # Breakpoints
+    └── js/
+        ├── data/mock-data.js    # Offline catalog fallback
+        ├── core/                # api, state, utils, chrome (nav/drawers), router
+        ├── views/               # One file per page (landing, catalog, cart, admin…)
+        └── main.js              # Boot
 
 ```
 
