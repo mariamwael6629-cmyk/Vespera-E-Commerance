@@ -311,41 +311,47 @@ a, button, input, select{-webkit-tap-highlight-color:transparent;}
   .auth-mobile-logo{display:none;}
 }
 @media (max-width: 900px){
-  .nav-desktop{display:none;}
+  .nav-desktop{display:none !important;}
+  #mega-menu{display:none;}
   .nav-burger{display:inline-flex;}
-  #hero-grid{grid-template-columns:1fr !important;min-height:auto !important;gap:40px !important;}
+  #hero-grid{grid-template-columns:minmax(0,1fr) !important;min-height:auto !important;gap:40px !important;}
   .hero-visual{height:380px !important;order:-1;}
   .cat-grid{grid-template-columns:repeat(2,1fr) !important;}
   .product-grid{grid-template-columns:repeat(2,1fr) !important;}
   .product-grid-3{grid-template-columns:repeat(2,1fr) !important;}
-  .about-grid{grid-template-columns:1fr !important;}
-  .catalog-grid{grid-template-columns:1fr !important;}
+  .about-grid{grid-template-columns:minmax(0,1fr) !important;}
+  .catalog-grid{grid-template-columns:minmax(0,1fr) !important;}
   .catalog-filters{order:2;border-top:1px solid var(--line);padding-top:24px;margin-top:24px;}
-  .pdp-grid{grid-template-columns:1fr !important;gap:32px !important;}
-  .reviews-grid{grid-template-columns:1fr !important;gap:24px !important;}
-  .cart-page-grid{grid-template-columns:1fr !important;}
-  .dash-grid{grid-template-columns:1fr !important;}
-  .addr-grid{grid-template-columns:1fr !important;}
+  .pdp-grid{grid-template-columns:minmax(0,1fr) !important;gap:32px !important;}
+  .reviews-grid{grid-template-columns:minmax(0,1fr) !important;gap:24px !important;}
+  .cart-page-grid{grid-template-columns:minmax(0,1fr) !important;}
+  .dash-grid{grid-template-columns:minmax(0,1fr) !important;}
+  .addr-grid{grid-template-columns:minmax(0,1fr) !important;}
   .footer-grid{grid-template-columns:1fr 1fr !important;gap:32px !important;}
   .admin-sidebar{position:fixed;left:0;top:0;bottom:0;z-index:400;transform:translateX(-100%);transition:transform .4s var(--ease);}
   .admin-sidebar.open{transform:translateX(0);}
   .admin-stat-grid{grid-template-columns:repeat(2,1fr) !important;}
-  .admin-chart-row{grid-template-columns:1fr !important;}
-  .promo-grid{grid-template-columns:1fr !important;}
-  .qv-grid{grid-template-columns:1fr !important;}
+  .admin-chart-row{grid-template-columns:minmax(0,1fr) !important;}
+  .promo-grid{grid-template-columns:minmax(0,1fr) !important;}
+  .qv-grid{grid-template-columns:minmax(0,1fr) !important;}
   .qv-grid img{border-radius:var(--radius-lg) var(--radius-lg) 0 0 !important;min-height:220px !important;}
 }
 @media (max-width: 600px){
   .cat-grid{grid-template-columns:1fr 1fr !important;gap:12px !important;}
   .product-grid{grid-template-columns:1fr 1fr !important;gap:14px !important;}
   .product-grid-3{grid-template-columns:1fr 1fr !important;gap:14px !important;}
-  .footer-grid{grid-template-columns:1fr !important;}
+  .footer-grid{grid-template-columns:minmax(0,1fr) !important;}
   .admin-stat-grid{grid-template-columns:1fr 1fr !important;}
   .nav-login{display:none;}
   h1.serif{word-break:break-word;}
+  /* phone header: wishlist moves into the menu drawer, icons tighten */
+  .nav-wish{display:none !important;}
+  .nav-actions{gap:6px !important;}
+  .nav-actions .btn-icon{width:38px;height:38px;}
+  #site-header .container{padding:0 16px;gap:12px !important;}
 }
 @media (max-width: 420px){
-  .cat-grid, .product-grid, .product-grid-3{grid-template-columns:1fr !important;}
+  .cat-grid, .product-grid, .product-grid-3{grid-template-columns:minmax(0,1fr) !important;}
 }
 
 /* ===================== SPEC SHEET LAYER ===================== */
@@ -401,7 +407,7 @@ h1,h2,h3{text-wrap:balance;}
 @media (max-width:900px){
   .hero-spec-grid{grid-template-columns:minmax(0,1fr);min-height:0;}
   .hero-visual.spec-figure{height:auto !important;order:0;}
-  .member-band{padding:40px 24px !important;grid-template-columns:1fr !important;}
+  .member-band{padding:40px 24px !important;grid-template-columns:minmax(0,1fr) !important;}
 }
 @media (max-width:600px){
   .spec-callout{min-width:0;padding:8px 10px;}
@@ -873,7 +879,7 @@ function renderHeader(){
         <button style="font-size:13.5px;font-weight:500;${active('landing')}" onclick="navigate('landing');setTimeout(()=>document.getElementById('about-anchor')?.scrollIntoView({behavior:'smooth'}),50);">About</button>
       </nav>
 
-      <div style="display:flex;align-items:center;gap:10px;flex:none;">
+      <div class="nav-actions" style="display:flex;align-items:center;gap:10px;flex:none;">
         <button class="btn-icon nav-search-btn" aria-label="Search" onclick="openSearch()">${icon('search',17)}</button>
         <button class="btn-icon" aria-label="Toggle dark mode" onclick="toggleTheme()">${icon(State.theme==='dark'?'sun':'moon',17)}</button>
         <div style="position:relative;">
@@ -881,7 +887,7 @@ function renderHeader(){
           ${State.notifications.some(n=>n.unread) ? `<span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--copper-bright);border:1.5px solid var(--ink);"></span>`:''}
           ${renderNotifPanel()}
         </div>
-        <button class="btn-icon" aria-label="Wishlist" onclick="navigate('wishlist')" style="position:relative;">
+        <button class="btn-icon nav-wish" aria-label="Wishlist" onclick="navigate('wishlist')" style="position:relative;">
           ${icon('heart',17)}
           ${State.wishlist.length ? `<span class="mono" style="position:absolute;top:-4px;right:-4px;background:var(--burgundy-bright);color:#fff;font-size:9.5px;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;">${State.wishlist.length}</span>`:''}
         </button>
@@ -1477,13 +1483,13 @@ function renderProductDetail(){
             ${materialSwatches(p.materials, pdpState.material, 'pdpSelectMaterial')}
           </div>
 
-          <div style="display:flex;gap:14px;margin-bottom:18px;">
+          <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:18px;">
             <div style="display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:999px;">
               <button onclick="pdpSetQty(${pdpState.qty-1})" style="width:44px;height:48px;font-size:16px;" aria-label="Decrease quantity">−</button>
               <span class="mono" style="font-size:14px;width:34px;text-align:center;">${pdpState.qty}</span>
               <button onclick="pdpSetQty(${pdpState.qty+1})" style="width:44px;height:48px;font-size:16px;" aria-label="Increase quantity">+</button>
             </div>
-            <button class="btn btn-primary btn-lg" style="flex:1;" ${p.stock===0?'disabled':''} onclick="addToCart('${p.id}', pdpState.material, pdpState.qty)">
+            <button class="btn btn-primary btn-lg" style="flex:1 1 200px;min-width:0;" ${p.stock===0?'disabled':''} onclick="addToCart('${p.id}', pdpState.material, pdpState.qty)">
               ${p.stock===0?'Out of stock':`Add to bag — ${fmt(p.price*pdpState.qty)}`}
             </button>
             <button class="btn-icon" style="width:48px;height:48px;" onclick="toggleWishlist('${p.id}');renderApp();" aria-label="Toggle wishlist">
