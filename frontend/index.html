@@ -5,51 +5,59 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VESPERA — Considered Objects</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
 <style>
 /* ===================== DESIGN TOKENS ===================== */
 :root{
-  /* Dark palette — used when data-theme="dark" or no theme set */
-  --ink:#141716;
-  --ink-soft:#1E2220;
-  --surface:#1C2120;
-  --surface-soft:#242C2A;
-  --ivory:#E8E6E1;
-  --ivory-dim:#CCCAC5;
-  --beige:#9A9890;
-  --burgundy:#2A3C2C;
-  --burgundy-bright:#3C5240;
-  --copper:#617063;
-  --copper-bright:#7A9C7C;
-  --copper-dim:#4A5C4C;
-  --line:rgba(232,230,225,0.09);
-  --line-strong:rgba(232,230,225,0.16);
-  --text-dim:rgba(232,230,225,0.58);
-  --text-faint:rgba(232,230,225,0.36);
+  /* "Spec sheet" system. Dark = blueprint, light (default) = drafting paper.
+     Variable names are historical: --ink is the ground, --ivory is the text. See DESIGN.md. */
+  --ink:#0E2133;
+  --ink-soft:#12293F;
+  --surface:#152E47;
+  --surface-soft:#1C3956;
+  --ivory:#EAF0F6;
+  --ivory-dim:#C6D2DE;
+  --beige:#93A7BA;
+  --burgundy:#1C3956;
+  --burgundy-bright:#244568;
+  --copper:#FF7A59;
+  --copper-bright:#FF8F72;
+  --copper-dim:#D35E40;
+  --line:rgba(234,240,246,0.13);
+  --line-strong:rgba(234,240,246,0.24);
+  --text-dim:rgba(234,240,246,0.74);
+  --text-faint:rgba(234,240,246,0.56);
+  --on-accent:#0E2133;
 
-  --font-display:'Cormorant', Georgia, serif;
-  --font-body:'Outfit', 'Helvetica Neue', sans-serif;
-  --font-mono:'Outfit', monospace;
+  --font-display:'Chivo', 'Helvetica Neue', sans-serif;
+  --font-body:'Chivo', 'Helvetica Neue', sans-serif;
+  --font-mono:'Chivo', 'Helvetica Neue', sans-serif;
 
   --radius-sm:2px;
-  --radius-md:4px;
-  --radius-lg:6px;
+  --radius-md:3px;
+  --radius-lg:4px;
   --ease:cubic-bezier(.16,1,.3,1);
 }
 
-/* Light mode overrides */
+/* Light mode: drafting paper */
 [data-theme="light"]{
-  --ink:#FAFAF8;
-  --ink-soft:#F0EDEA;
-  --surface:#F0EDEA;
-  --surface-soft:#E8E3DC;
-  --ivory:#1A1F1E;
-  --ivory-dim:#303835;
-  --beige:#5A5754;
-  --line:rgba(26,31,30,0.08);
-  --line-strong:rgba(26,31,30,0.15);
-  --text-dim:rgba(26,31,30,0.58);
-  --text-faint:rgba(26,31,30,0.36);
+  --ink:#F3F4F1;
+  --ink-soft:#EAECE8;
+  --surface:#FFFFFF;
+  --surface-soft:#E6E9E4;
+  --ivory:#111315;
+  --ivory-dim:#2E3236;
+  --beige:#5B6065;
+  --burgundy:#111315;
+  --burgundy-bright:#24282C;
+  --copper:#D23F1E;
+  --copper-bright:#BF3819;
+  --copper-dim:#A0301A;
+  --line:rgba(17,19,21,0.12);
+  --line-strong:rgba(17,19,21,0.24);
+  --text-dim:rgba(17,19,21,0.72);
+  --text-faint:rgba(17,19,21,0.58);
+  --on-accent:#FFFFFF;
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -68,7 +76,8 @@ a{color:inherit;text-decoration:none;}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
 img{display:block;max-width:100%;}
 .serif{font-family:var(--font-display);}
-.mono{font-family:var(--font-mono);}
+.mono{font-family:var(--font-body);font-variant-numeric:tabular-nums;letter-spacing:0 !important;}
+.serif{letter-spacing:-.02em;}
 
 ::-webkit-scrollbar{width:10px;height:10px;}
 ::-webkit-scrollbar-track{background:var(--ink);}
@@ -93,42 +102,38 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 @media (max-width:900px){.container{padding:0 22px;}}
 
 .glass{
-  background:linear-gradient(155deg, rgba(246,239,228,0.07), rgba(246,239,228,0.02));
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  border:1px solid var(--line);
+  background:var(--surface);
+  border:1px solid var(--line-strong);
 }
-[data-theme="light"] .glass{
-  background:rgba(250,250,248,0.88);
-}
+
 
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:14px 28px;border-radius:0;font-size:12px;font-weight:600;
-  letter-spacing:.1em;text-transform:uppercase;
+  padding:14px 26px;border-radius:var(--radius-md);font-size:15px;font-weight:700;
+  min-height:48px;
   transition:transform .3s var(--ease), box-shadow .3s var(--ease), background .3s var(--ease), color .3s var(--ease), opacity .3s var(--ease);
   white-space:nowrap;
 }
 .btn-primary{
-  background:var(--ivory);
-  color:var(--ink);
+  background:var(--copper);
+  color:var(--on-accent);
   box-shadow:none;
 }
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px -4px rgba(26,31,30,0.18);}
+.btn-primary:hover{background:var(--ivory);color:var(--ink);}
 .btn-primary:active{transform:translateY(0) scale(.98);}
 .btn-ghost{
   border:1px solid var(--line-strong);
   color:var(--ivory);
   background:transparent;
 }
-.btn-ghost:hover{border-color:var(--copper-bright);background:rgba(97,112,99,0.06);}
+.btn-ghost:hover{border-color:var(--ivory);background:var(--surface-soft);}
 .btn-dark{
   background:var(--ivory);
   color:var(--ink);
   border:1px solid var(--line-strong);
 }
-.btn-sm{padding:10px 18px;font-size:11.5px;}
-.btn-lg{padding:18px 36px;font-size:14px;}
+.btn-sm{padding:8px 16px;font-size:14px;min-height:38px;}
+.btn-lg{padding:16px 30px;font-size:16px;min-height:54px;}
 .btn-block{width:100%;}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none !important;}
 .btn-icon{
@@ -137,25 +142,24 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   border:1px solid var(--line-strong);
   transition:transform .3s var(--ease), border-color .3s var(--ease), background .3s var(--ease);
 }
-.btn-icon:hover{border-color:var(--copper);background:rgba(184,122,75,0.1);transform:translateY(-1px);}
+.btn-icon:hover{border-color:var(--ivory);background:var(--surface-soft);}
 
 .eyebrow{
-  font-family:var(--font-mono);
-  font-size:11px;
-  letter-spacing:.16em;
-  text-transform:uppercase;
+  font-family:var(--font-body);
+  font-size:14px;
+  font-weight:600;
   color:var(--copper-bright);
   display:flex;align-items:center;gap:10px;
 }
-.eyebrow::before{content:'';width:18px;height:1px;background:var(--copper-bright);}
+.eyebrow::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;}
 
 .divider{height:1px;background:var(--line);border:none;width:100%;}
 
 .badge{
   display:inline-flex;align-items:center;gap:6px;
   padding:5px 12px;border-radius:999px;
-  font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
-  font-family:var(--font-mono);
+  font-size:12.5px;font-weight:700;
+  font-family:var(--font-body);
 }
 .badge-copper{background:rgba(184,122,75,0.16);color:var(--copper-bright);border:1px solid rgba(184,122,75,0.3);}
 .badge-burgundy{background:rgba(122,35,48,0.22);color:#E8919E;border:1px solid rgba(122,35,48,0.4);}
@@ -199,8 +203,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 @keyframes loaderSpin{to{transform:rotate(360deg);}}
 @keyframes loaderDraw{from{stroke-dashoffset:200;} to{stroke-dashoffset:0;}}
 .loader-text{
-  font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--text-dim);
+  font-family:var(--font-body);font-size:14px;color:var(--text-dim);
 }
 
 /* toast / notification */
@@ -235,8 +238,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 /* Modal/drawer overlay */
 .overlay{
   position:fixed;inset:0;z-index:7000;
-  background:rgba(10,8,7,0.7);
-  backdrop-filter:blur(6px);
+  background:rgba(8,14,22,0.62);
   display:flex;
   opacity:0;visibility:hidden;
   transition:opacity .4s var(--ease), visibility .4s;
@@ -264,7 +266,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 
 /* Form elements */
 .field{display:flex;flex-direction:column;gap:7px;margin-bottom:18px;}
-.field label{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-dim);}
+.field label{font-size:14px;font-weight:600;color:var(--ivory);}
 .field input, .field select, .field textarea{
   background:rgba(246,239,228,0.04);
   border:1px solid var(--line-strong);
@@ -345,6 +347,72 @@ a, button, input, select{-webkit-tap-highlight-color:transparent;}
 @media (max-width: 420px){
   .cat-grid, .product-grid, .product-grid-3{grid-template-columns:1fr !important;}
 }
+
+/* ===================== SPEC SHEET LAYER ===================== */
+body{font-size:16px;}
+h1,h2,h3{text-wrap:balance;}
+.serif{font-weight:800 !important;}
+.card{border-radius:var(--radius-lg);}
+.reveal{opacity:1;transform:none;}
+.hero-spec{padding:56px 0 24px;}
+.hero-spec-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(40px,6vw,96px);align-items:center;min-height:min(78vh,760px);}
+.hero-spec-title{font-family:var(--font-display);font-weight:800;font-size:clamp(44px,6.4vw,92px);line-height:.96;letter-spacing:-.04em;margin-bottom:28px;max-width:13ch;}
+.hero-spec-lead{font-size:clamp(17px,1.3vw,19px);color:var(--text-dim);max-width:42ch;line-height:1.6;margin-bottom:36px;}
+.hero-spec-stats{display:flex;gap:clamp(24px,4vw,56px);margin-top:48px;padding-top:20px;border-top:2px solid var(--ivory);flex-wrap:wrap;}
+.hero-spec-stats .v{font-size:32px;font-weight:800;letter-spacing:-.03em;}
+.hero-spec-stats .l{font-size:14px;color:var(--text-dim);}
+.spec-figure{position:relative;margin:0;padding:28px 0 0;}
+.spec-plate{position:relative;aspect-ratio:4/5;background:var(--surface-soft);border-radius:var(--radius-lg);overflow:hidden;}
+.spec-plate img{width:100%;height:100%;object-fit:cover;}
+.spec-callout{position:absolute;display:flex;flex-direction:column;gap:2px;background:var(--ink);padding:10px 14px;border:1px solid var(--line-strong);border-radius:var(--radius-md);min-width:150px;z-index:2;}
+.spec-callout::before{content:'';position:absolute;width:44px;height:1px;background:var(--copper);top:50%;}
+.spec-callout::after{content:'';position:absolute;width:9px;height:9px;border-radius:50%;background:var(--copper);top:calc(50% - 4px);box-shadow:0 0 0 3px var(--ink);}
+.spec-callout .k{font-size:13px;color:var(--text-dim);}
+.spec-callout .val{font-size:15px;font-weight:700;}
+.spec-callout.c0{top:12%;left:-56px;}
+.spec-callout.c1{top:38%;right:-48px;}
+.spec-callout.c2{top:62%;left:-56px;}
+.spec-callout.c3{bottom:16%;right:-48px;}
+.spec-callout.c0::before,.spec-callout.c2::before{left:100%;}
+.spec-callout.c0::after,.spec-callout.c2::after{left:calc(100% + 44px);}
+.spec-callout.c1::before,.spec-callout.c3::before{right:100%;}
+.spec-callout.c1::after,.spec-callout.c3::after{right:calc(100% + 44px);}
+.spec-caption{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 0 0;font-size:15px;border-bottom:2px solid var(--ivory);padding-bottom:14px;}
+.swatch-dot{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--line-strong);}
+.spec-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:40px;padding:16px 0;border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line-strong);font-size:15px;font-weight:600;}
+.spec-strip span{color:var(--copper);}
+.member-band h2{color:var(--ink) !important;}
+.member-band p{color:var(--ink) !important;opacity:.78;}
+.member-band .eyebrow{color:var(--copper-bright) !important;}
+.member-band .btn-primary{background:var(--copper);color:var(--on-accent);}
+[data-theme="dark"] .member-band{background:var(--surface-soft) !important;}
+[data-theme="dark"] .member-band h2,[data-theme="dark"] .member-band p{color:var(--ivory) !important;}
+@media (prefers-reduced-motion:no-preference){
+  .spec-callout{animation:callIn .7s var(--ease) both;}
+  .spec-callout.c1{animation-delay:.08s}.spec-callout.c2{animation-delay:.16s}.spec-callout.c3{animation-delay:.24s}
+  .hero-spec-copy > *{animation:viewIn .7s var(--ease) both;}
+}
+@keyframes callIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+@media (max-width:1100px){
+  .spec-callout.c0,.spec-callout.c2{left:12px;}
+  .spec-callout.c1,.spec-callout.c3{right:12px;}
+  .spec-callout::before,.spec-callout::after{display:none;}
+}
+@media (max-width:900px){
+  .hero-spec-grid{grid-template-columns:minmax(0,1fr);min-height:0;}
+  .hero-visual.spec-figure{height:auto !important;order:0;}
+  .member-band{padding:40px 24px !important;grid-template-columns:1fr !important;}
+}
+@media (max-width:600px){
+  .spec-callout{min-width:0;padding:8px 10px;}
+  .spec-callout .val{font-size:13px;}
+  .hero-spec .btn-lg{width:100%;}
+}
+[data-theme="light"] .badge-success{background:#E3F1E6;color:#1E6B35;border-color:#BFDCC6;}
+[data-theme="light"] .badge-burgundy{background:#FBE5E1;color:#A0301A;border-color:#F1C2B8;}
+[data-theme="light"] .badge-copper{background:#FBE5E1;color:#A0301A;border-color:#F1C2B8;}
+[data-theme="light"] .badge-ivory{background:var(--surface-soft);color:var(--ivory);}
+span[style*="color:var(--copper-bright)"] > svg.lucide-star, span[style*="color:var(--copper-bright)"] > i > svg{fill:currentColor;}
 </style>
 </head>
 <body>
@@ -363,7 +431,7 @@ a, button, input, select{-webkit-tap-highlight-color:transparent;}
 <div id="toast-stack" class="toast-stack"></div>
 <div id="overlay-root"></div>
 
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.js"></script>
 <script>
 /* ============================================================
    VESPERA — single-file e-commerce prototype
@@ -379,12 +447,12 @@ const CATEGORIES = [
 ];
 
 const MATERIALS = {
-  walnut:{name:'Walnut', sw:'linear-gradient(135deg,#6b4730,#4a2f1d)'},
-  obsidian:{name:'Obsidian', sw:'linear-gradient(135deg,#3a3530,#15110F)'},
-  ivory:{name:'Bone Ivory', sw:'linear-gradient(135deg,#F6EFE4,#D8CBB0)'},
-  burgundy:{name:'Burgundy', sw:'linear-gradient(135deg,#7A2330,#3C1015)'},
-  copper:{name:'Copper', sw:'linear-gradient(135deg,#D49A6A,#8C6240)'},
-  slate:{name:'Slate', sw:'linear-gradient(135deg,#5b5650,#36322e)'},
+  walnut:{name:'Walnut', sw:'#5E3E28'},
+  obsidian:{name:'Obsidian', sw:'#25211E'},
+  ivory:{name:'Bone Ivory', sw:'#E9E1D2'},
+  burgundy:{name:'Burgundy', sw:'#6A1F2A'},
+  copper:{name:'Copper', sw:'#B97C4E'},
+  slate:{name:'Slate', sw:'#4D4944'},
 };
 
 function img(seed, w=800, h=800){ return `https://picsum.photos/seed/${seed}/${w}/${h}`; }
@@ -776,8 +844,8 @@ function materialSwatches(materialKeys, selected, onClick){
 function renderHeader(){
   const active = (v)=> State.view===v ? 'color:var(--ivory);' : 'color:var(--text-dim);';
   return `
-  <header id="site-header" style="position:sticky;top:0;z-index:500;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    background:${State.theme==='dark'?'rgba(20,23,22,0.82)':'rgba(250,250,248,0.88)'};border-bottom:1px solid var(--line);transition:background .4s var(--ease);">
+  <header id="site-header" style="position:sticky;top:0;z-index:500;
+    background:var(--ink);border-bottom:1px solid var(--line);transition:background .4s var(--ease);">
     <div class="container" style="display:flex;align-items:center;justify-content:space-between;height:78px;gap:24px;">
       <a href="#" onclick="navigate('landing');return false;" class="serif" style="font-size:22px;font-weight:500;letter-spacing:.02em;display:flex;align-items:center;gap:10px;flex:none;">
         <span style="width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line-strong);">
@@ -796,7 +864,7 @@ function renderHeader(){
                 <div>
                   <a href="#" onclick="navigate('catalog',{cat:'${c.id}'});return false;" class="serif" style="font-size:17px;display:block;margin-bottom:6px;">${c.name}</a>
                   <p style="font-size:12.5px;color:var(--text-dim);line-height:1.5;margin-bottom:14px;">${c.desc}</p>
-                  <a href="#" onclick="navigate('catalog',{cat:'${c.id}'});return false;" class="mono" style="font-size:11px;color:var(--copper-bright);letter-spacing:.05em;">VIEW ALL →</a>
+                  <a href="#" onclick="navigate('catalog',{cat:'${c.id}'});return false;" class="mono" style="font-size:11px;color:var(--copper-bright);letter-spacing:.05em;">View all</a>
                 </div>`).join('')}
             </div>
           </div>
@@ -860,7 +928,7 @@ function renderNotifPanel(){
   return `<div class="glass" style="position:absolute;top:50px;right:0;width:340px;border-radius:var(--radius-md);overflow:hidden;box-shadow:0 24px 48px -12px rgba(0,0,0,.5);z-index:600;" onclick="event.stopPropagation()">
     <div style="padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;">
       <span style="font-weight:700;font-size:13.5px;">Notifications</span>
-      <button class="mono" style="font-size:10.5px;color:var(--copper-bright);" onclick="markAllRead()">MARK ALL READ</button>
+      <button class="mono" style="font-size:10.5px;color:var(--copper-bright);" onclick="markAllRead()">Mark all read</button>
     </div>
     <div style="max-height:340px;overflow-y:auto;">
       ${State.notifications.map(n=>`
@@ -996,7 +1064,7 @@ function renderFooter(){
       <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;" class="footer-grid">
         <div>
           <div class="serif" style="font-size:20px;margin-bottom:14px;">Vespera</div>
-          <p style="font-size:13px;color:var(--text-dim);line-height:1.7;max-width:280px;">Considered objects for the desk, the ear, and the everyday carry. Designed quietly, built to last.</p>
+          <p style="font-size:13px;color:var(--text-dim);line-height:1.7;max-width:280px;">Considered objects for the desk, the ear and the everyday carry, built to last.</p>
           <div style="display:flex;gap:10px;margin-top:20px;">
             ${['instagram','twitter','youtube'].map(s=>`<button class="btn-icon" style="width:36px;height:36px;" aria-label="${s}">${icon(s,15)}</button>`).join('')}
           </div>
@@ -1025,9 +1093,9 @@ function renderFooter(){
       <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
         <span class="mono" style="font-size:11px;color:var(--text-faint);">© 2026 VESPERA STUDIO. ALL RIGHTS RESERVED.</span>
         <div style="display:flex;gap:20px;">
-          <span class="mono" style="font-size:11px;color:var(--text-faint);">PRIVACY</span>
-          <span class="mono" style="font-size:11px;color:var(--text-faint);">TERMS</span>
-          <span class="mono" style="font-size:11px;color:var(--text-faint);">ACCESSIBILITY</span>
+          <span class="mono" style="font-size:11px;color:var(--text-faint);">Privacy</span>
+          <span class="mono" style="font-size:11px;color:var(--text-faint);">Terms</span>
+          <span class="mono" style="font-size:11px;color:var(--text-faint);">Accessibility</span>
         </div>
       </div>
     </div>
@@ -1087,45 +1155,39 @@ function renderLanding(){
   const featured = PRODUCTS.filter(p=>['p01','p07','p02','p03'].includes(p.id));
   const bestsellers = PRODUCTS.filter(p=>p.tag==='Bestseller' || p.rating>=4.7).slice(0,4);
   return `
-  <section style="position:relative;padding:64px 0 0;overflow:hidden;">
-    <div class="container" style="display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center;min-height:78vh;" id="hero-grid">
-      <div style="position:relative;z-index:2;">
-        <div class="eyebrow" style="margin-bottom:24px;">Spring/Summer collection — No. 04</div>
-        <h1 class="serif" style="font-size:clamp(42px,6vw,76px);line-height:1.02;font-weight:500;letter-spacing:-.01em;margin-bottom:24px;">
-          Objects built<br><span style="font-style:italic;color:var(--copper-bright);">to be kept,</span><br>not replaced.
-        </h1>
-        <p style="font-size:16px;color:var(--text-dim);max-width:440px;line-height:1.7;margin-bottom:36px;">
-          Vespera designs the small technology you touch every day — headphones, carry, and desk objects machined from real materials and finished by hand.
+  <section class="hero-spec">
+    <div class="container hero-spec-grid" id="hero-grid">
+      <div class="hero-spec-copy">
+        <div class="eyebrow" style="margin-bottom:24px;">Spring/Summer collection, No. 04</div>
+        <h1 class="hero-spec-title">Small technology, built to be kept.</h1>
+        <p class="hero-spec-lead">
+          Vespera designs the small technology you touch every day: headphones, carry, and desk objects machined from real materials and finished by hand.
         </p>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;">
-          <button class="btn btn-primary btn-lg" onclick="navigate('catalog',{cat:'all'})">Shop the collection ${icon('arrow-right',15)}</button>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-lg" onclick="navigate('catalog',{cat:'all'})">Shop the collection ${icon('arrow-right',16)}</button>
           <button class="btn btn-ghost btn-lg" onclick="navigate('product',{id:'p01'})">View Aria II</button>
         </div>
-        <div style="display:flex;gap:36px;margin-top:56px;">
-          <div><div class="serif" style="font-size:26px;">12k+</div><div class="mono" style="font-size:10.5px;color:var(--text-faint);letter-spacing:.08em;">OBJECTS SHIPPED</div></div>
-          <div><div class="serif" style="font-size:26px;">4.8/5</div><div class="mono" style="font-size:10.5px;color:var(--text-faint);letter-spacing:.08em;">AVG. RATING</div></div>
-          <div><div class="serif" style="font-size:26px;">7 yrs</div><div class="mono" style="font-size:10.5px;color:var(--text-faint);letter-spacing:.08em;">AVG. PRODUCT LIFE</div></div>
+        <div class="hero-spec-stats">
+          <div><div class="v">12k+</div><div class="l">Objects shipped</div></div>
+          <div><div class="v">4.8/5</div><div class="l">Avg. rating</div></div>
+          <div><div class="v">7 yrs</div><div class="l">Avg. product life</div></div>
         </div>
       </div>
-      <div style="position:relative;height:560px;" class="hero-visual">
-        <div style="position:absolute;inset:0;border-radius:32px;overflow:hidden;background:linear-gradient(155deg,var(--surface),var(--ink-soft));">
-          <img src="${img('hero-aria',900,1100)}" alt="Aria II Headphones in walnut finish" style="width:100%;height:100%;object-fit:cover;opacity:.92;">
+      <figure class="hero-visual spec-figure">
+        <div class="spec-plate">
+          <img src="${img('hero-aria',900,1100)}" alt="Aria II Headphones in walnut finish">
         </div>
-        <div class="glass reveal in" style="position:absolute;bottom:28px;left:-28px;padding:18px 22px;border-radius:var(--radius-md);max-width:230px;box-shadow:0 24px 48px -16px rgba(0,0,0,.5);">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <span style="width:30px;height:30px;border-radius:50%;background:${MATERIALS.walnut.sw};flex:none;"></span>
-            <span style="font-size:13px;font-weight:600;">Aria II — Walnut</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <span class="mono" style="font-size:15px;font-weight:600;color:var(--copper-bright);">${fmt(429)}</span>
-            ${starRow(4.8,12)}
-          </div>
-        </div>
-        <div class="glass" style="position:absolute;top:24px;right:-20px;padding:14px 16px;border-radius:var(--radius-md);display:flex;align-items:center;gap:10px;">
-          ${icon('truck',16)}<span style="font-size:12px;">Free shipping over $150</span>
-        </div>
-      </div>
+        ${(()=>{ const aria = PRODUCTS.find(p=>p.id==='p01'); const sp = (aria && aria.specs) || {}; const keys = Object.keys(sp).slice(0,4);
+          return keys.map((k,i)=>`<div class="spec-callout c${i}"><span class="k">${k}</span><span class="val">${sp[k]}</span></div>`).join(''); })()}
+        <figcaption class="spec-caption">
+          <span class="swatch-dot" style="background:${MATERIALS.walnut.sw}"></span>
+          <span><b>Aria II</b> in walnut</span>
+          <span class="mono" style="margin-left:auto;font-weight:700;">${fmt(429)}</span>
+          ${starRow(4.8,12)}
+        </figcaption>
+      </figure>
     </div>
+    <div class="container"><div class="spec-strip">${icon('truck',16)} Free shipping over $150 <span>·</span> Repaired, not replaced <span>·</span> Finished by hand</div></div>
   </section>
 
   <section style="padding:120px 0 40px;">
@@ -1133,7 +1195,7 @@ function renderLanding(){
       <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;flex-wrap:wrap;gap:16px;">
         <div>
           <div class="eyebrow" style="margin-bottom:14px;">Shop by world</div>
-          <h2 class="serif" style="font-size:clamp(28px,3.4vw,40px);font-weight:500;">Four categories. No clutter.</h2>
+          <h2 class="serif" style="font-size:clamp(28px,3.4vw,40px);font-weight:500;">Four categories to choose from</h2>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;" class="cat-grid">
@@ -1144,7 +1206,7 @@ function renderLanding(){
             <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(21,17,15,0.85), rgba(21,17,15,0.1) 50%);"></div>
             <div style="position:absolute;bottom:0;left:0;padding:22px;">
               <div class="serif" style="font-size:21px;color:#fff;margin-bottom:6px;">${c.name}</div>
-              <div class="mono" style="font-size:10.5px;color:rgba(255,255,255,.7);letter-spacing:.06em;">EXPLORE →</div>
+              <div class="mono" style="font-size:10.5px;color:rgba(255,255,255,.7);letter-spacing:.06em;">Explore</div>
             </div>
           </button>`).join('')}
       </div>
@@ -1168,8 +1230,7 @@ function renderLanding(){
 
   <section style="padding:40px 0 120px;">
     <div class="container">
-      <div class="card reveal" style="background:linear-gradient(135deg, var(--burgundy) 0%, var(--ink-soft) 60%);border:none;border-radius:32px;padding:72px 60px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:40px;overflow:hidden;position:relative;">
-        <div style="position:absolute;right:-60px;top:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle, rgba(184,122,75,0.25), transparent 70%);"></div>
+      <div class="card reveal member-band" style="background:var(--burgundy);border:none;border-radius:var(--radius-lg);padding:72px 60px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:40px;overflow:hidden;position:relative;">
         <div style="position:relative;z-index:1;">
           <div class="eyebrow" style="margin-bottom:16px;color:var(--copper-bright);">Members get more</div>
           <h2 class="serif" style="font-size:clamp(26px,3.2vw,38px);color:#fff;margin-bottom:14px;max-width:480px;">Create an account for early access and member pricing.</h2>
@@ -1187,7 +1248,7 @@ function renderLanding(){
           <div class="eyebrow" style="margin-bottom:18px;">Bestsellers</div>
           <h2 class="serif" style="font-size:clamp(26px,3vw,36px);margin-bottom:20px;">What people keep coming back for</h2>
           <p style="color:var(--text-dim);font-size:14.5px;line-height:1.7;margin-bottom:28px;max-width:440px;">
-            Every Vespera object is designed to outlast the trend cycle — built from materials that age well and repaired, not replaced, when something wears out.
+            Every Vespera object is made from materials that age well, and we repair it when something wears out.
           </p>
           <button class="btn btn-dark" onclick="navigate('catalog',{cat:'all',sort:'rating'})">Shop bestsellers ${icon('arrow-right',15)}</button>
         </div>
@@ -1750,7 +1811,7 @@ function renderOrderConfirm(){
 /* ===================== VIEW: AUTH ===================== */
 function authShell(content){
   return `<div style="min-height:100vh;display:flex;">
-    <div style="flex:1;display:none;position:relative;overflow:hidden;background:linear-gradient(155deg,var(--surface),var(--ink-soft));" class="auth-visual">
+    <div style="flex:1;display:none;position:relative;overflow:hidden;background:var(--surface-soft);" class="auth-visual">
       <img src="${img('auth-visual',900,1200)}" style="width:100%;height:100%;object-fit:cover;opacity:.85;">
       <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(21,17,15,0.6), transparent 50%);"></div>
       <a href="#" onclick="navigate('landing');return false;" class="serif" style="position:absolute;top:40px;left:40px;font-size:22px;color:#fff;">Vespera</a>
@@ -1876,7 +1937,7 @@ function renderDashboard(){
       <aside>
         <div class="card" style="padding:20px;margin-bottom:20px;">
           <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--copper-bright),var(--burgundy));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">${State.user.name[0].toUpperCase()}</div>
+            <div style="width:44px;height:44px;border-radius:50%;background:var(--copper);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">${State.user.name[0].toUpperCase()}</div>
             <div style="min-width:0;"><div style="font-weight:700;font-size:14px;">${State.user.name}</div><div style="font-size:11.5px;color:var(--text-faint);overflow:hidden;text-overflow:ellipsis;">${State.user.email}</div></div>
           </div>
         </div>
@@ -2035,9 +2096,9 @@ function renderAdmin(){
   return `<div style="display:flex;min-height:100vh;" class="admin-shell">
     <aside style="width:240px;flex:none;background:var(--surface);border-right:1px solid var(--line);padding:24px 16px;display:flex;flex-direction:column;" class="admin-sidebar">
       <a href="#" onclick="navigate('landing');return false;" class="serif" style="font-size:19px;padding:0 10px;margin-bottom:32px;display:flex;align-items:center;gap:10px;">
-        <span style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--copper-bright),var(--burgundy));display:inline-flex;align-items:center;justify-content:center;">
+        <span style="width:24px;height:24px;border-radius:50%;background:var(--copper);display:inline-flex;align-items:center;justify-content:center;">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L20 7V17L12 22L4 17V7L12 2Z" stroke="#15110F" stroke-width="1.8"/></svg>
-        </span>Vespera <span class="mono" style="font-size:10px;color:var(--text-faint);">ADMIN</span>
+        </span>Vespera <span class="mono" style="font-size:10px;color:var(--text-faint);">Admin</span>
       </a>
       <nav style="display:flex;flex-direction:column;gap:2px;flex:1;">
         ${ADMIN_NAV.map(([id,label,ic])=>`
@@ -2052,7 +2113,7 @@ function renderAdmin(){
         <h1 class="serif" style="font-size:20px;text-transform:capitalize;">${ADMIN_NAV.find(n=>n[0]===State.adminView)?.[1]}</h1>
         <div style="display:flex;align-items:center;gap:14px;">
           <button class="btn-icon" aria-label="Toggle theme" onclick="toggleTheme()">${icon(State.theme==='dark'?'sun':'moon',16)}</button>
-          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--copper-bright),var(--burgundy));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">D</div>
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--copper);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">D</div>
         </div>
       </div>
       <div style="padding:32px;">${adminViewContent()}</div>
@@ -2093,7 +2154,7 @@ function adminOverview(){
         <div style="display:flex;align-items:flex-end;gap:8px;height:180px;">
           ${chartData.map((v,i)=>`
             <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end;">
-              <div style="width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--copper-bright),var(--copper-dim));height:${(v/maxV*100)}%;transition:height .8s var(--ease);" title="${months[i]}: ${fmt(v*1000)}"></div>
+              <div style="width:100%;border-radius:4px 4px 0 0;background:var(--copper);height:${(v/maxV*100)}%;transition:height .8s var(--ease);" title="${months[i]}: ${fmt(v*1000)}"></div>
               <span class="mono" style="font-size:9.5px;color:var(--text-faint);">${months[i]}</span>
             </div>`).join('')}
         </div>
@@ -2269,7 +2330,7 @@ function adminUsers(){
         <tbody>
           ${ADMIN_USERS.map(u=>`
             <tr style="border-bottom:1px solid var(--line);" onmouseover="this.style.background='rgba(184,122,75,0.04)'" onmouseout="this.style.background='none'">
-              <td style="padding:12px 20px;"><div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--copper-bright),var(--burgundy));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex:none;">${u.name[0]}</div><div><div style="font-size:13px;font-weight:600;">${u.name}</div><div style="font-size:11px;color:var(--text-faint);">${u.email}</div></div></div></td>
+              <td style="padding:12px 20px;"><div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:50%;background:var(--copper);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex:none;">${u.name[0]}</div><div><div style="font-size:13px;font-weight:600;">${u.name}</div><div style="font-size:11px;color:var(--text-faint);">${u.email}</div></div></div></td>
               <td style="padding:12px 20px;"><span class="badge badge-ivory">${u.role}</span></td>
               <td style="padding:12px 20px;font-size:13px;" class="mono">${u.orders}</td>
               <td style="padding:12px 20px;font-size:13px;" class="mono">${fmt(u.spent)}</td>
